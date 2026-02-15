@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { ChevronDown, ArrowDownUp, Building2, Briefcase, Mic, Video, Share2 } from "lucide-react";
+import { Mic } from "lucide-react";
 import { motion } from "framer-motion";
 import { DotPattern, GridPattern, AnimatedBeams } from "@/components/ui/animated-background";
 
@@ -20,31 +20,7 @@ export default function Home() {
         <div className="animation-delay-4000 absolute bottom-20 left-1/3 h-96 w-96 animate-blob rounded-full bg-sky-400/15 mix-blend-multiply blur-3xl filter" />
       </div>
 
-      {/* Glassmorphic Taskbar */}
-      <div className="fixed bottom-8 left-1/2 z-50 -translate-x-1/2">
-        <motion.div
-          initial={{ y: 100, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.5, duration: 0.5 }}
-          className="rounded-2xl border border-white/40 bg-white/30 px-6 py-3 shadow-2xl backdrop-blur-xl"
-        >
-          <div className="flex items-center gap-4">
-            <button className="flex h-12 w-12 items-center justify-center rounded-xl bg-white/40 transition-all hover:bg-white/60">
-              <Video className="h-5 w-5 text-blue-600" />
-            </button>
-            <button className="flex h-12 w-12 items-center justify-center rounded-xl bg-white/40 transition-all hover:bg-white/60">
-              <Mic className="h-5 w-5 text-blue-600" />
-            </button>
-            <button className="flex h-12 w-12 items-center justify-center rounded-xl bg-white/40 transition-all hover:bg-white/60">
-              <Share2 className="h-5 w-5 text-blue-600" />
-            </button>
-            <div className="mx-2 h-8 w-px bg-white/40" />
-            <button className="rounded-xl bg-red-500/80 px-6 py-3 text-sm font-semibold text-white backdrop-blur-sm transition-all hover:bg-red-600">
-              Leave
-            </button>
-          </div>
-        </motion.div>
-      </div>
+
       {/* Header */}
       <header className="relative z-10 mx-auto max-w-7xl px-6 py-8">
         <motion.div
@@ -269,13 +245,15 @@ export default function Home() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.7, duration: 0.5 }}
             >
-              <Button
-                size="lg"
-                className="group relative overflow-hidden rounded-2xl border border-white/40 bg-white/70 px-12 py-6 text-lg font-semibold text-gray-900 shadow-[0_8px_32px_rgba(0,0,0,0.12)] backdrop-blur-2xl transition-all hover:bg-white/80 hover:shadow-[0_8px_32px_rgba(0,0,0,0.16)]"
-              >
-                <span className="relative z-10">Get Started</span>
-                <div className="absolute inset-0 -z-0 bg-gradient-to-r from-blue-400/20 to-cyan-400/20 opacity-0 transition-opacity group-hover:opacity-100" />
-              </Button>
+              <Link href="/tutor">
+                <Button
+                  size="lg"
+                  className="group relative overflow-hidden rounded-2xl border border-white/40 bg-white/70 px-12 py-6 text-lg font-semibold text-gray-900 shadow-[0_8px_32px_rgba(0,0,0,0.12)] backdrop-blur-2xl transition-all hover:bg-white/80 hover:shadow-[0_8px_32px_rgba(0,0,0,0.16)]"
+                >
+                  <span className="relative z-10">Get Started</span>
+                  <div className="absolute inset-0 -z-0 bg-gradient-to-r from-blue-400/20 to-cyan-400/20 opacity-0 transition-opacity group-hover:opacity-100" />
+                </Button>
+              </Link>
             </motion.div>
 
             {/* Optional subtitle */}
