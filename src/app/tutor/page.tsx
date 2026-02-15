@@ -14,11 +14,11 @@ import { cn } from "@/lib/utils";
 const MAX_AGENTS = 6;
 
 const BADGE_PALETTE = [
-  { accent: "from-blue-500 to-cyan-400", badge: "bg-blue-500/20 text-blue-300 border-blue-500/30" },
-  { accent: "from-purple-500 to-pink-400", badge: "bg-purple-500/20 text-purple-300 border-purple-500/30" },
-  { accent: "from-emerald-500 to-teal-400", badge: "bg-emerald-500/20 text-emerald-300 border-emerald-500/30" },
-  { accent: "from-orange-500 to-amber-400", badge: "bg-orange-500/20 text-orange-300 border-orange-500/30" },
-  { accent: "from-rose-500 to-red-400", badge: "bg-rose-500/20 text-rose-300 border-rose-500/30" },
+  { accent: "from-blue-500 to-cyan-400", badge: "bg-blue-50 text-blue-700 border-blue-200" },
+  { accent: "from-purple-500 to-pink-400", badge: "bg-purple-50 text-purple-700 border-purple-200" },
+  { accent: "from-emerald-500 to-teal-400", badge: "bg-emerald-50 text-emerald-700 border-emerald-200" },
+  { accent: "from-orange-500 to-amber-400", badge: "bg-orange-50 text-orange-700 border-orange-200" },
+  { accent: "from-rose-500 to-red-400", badge: "bg-rose-50 text-rose-700 border-rose-200" },
 ];
 
 interface AgentEntry {
@@ -132,13 +132,13 @@ export default function TutorPage() {
   }, [totalItems]);
 
   return (
-    <div className="flex flex-col h-screen font-[family-name:var(--font-geist-sans)] bg-[#06060c] text-white overflow-hidden">
+    <div className="flex flex-col h-screen font-[family-name:var(--font-geist-sans)] bg-gradient-to-br from-slate-50 via-white to-blue-50/30 text-slate-900 overflow-hidden">
       {/* Animated background */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -left-40 w-[500px] h-[500px] bg-blue-600/[0.07] rounded-full blur-[120px] animate-pulse" />
-        <div className="absolute top-1/3 -right-32 w-[400px] h-[400px] bg-indigo-500/[0.06] rounded-full blur-[100px]" />
-        <div className="absolute -bottom-32 left-1/3 w-[350px] h-[350px] bg-cyan-500/[0.05] rounded-full blur-[100px]" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-purple-600/[0.03] rounded-full blur-[150px]" />
+        <div className="absolute -top-40 -left-40 w-[500px] h-[500px] bg-blue-200/30 rounded-full blur-[120px] animate-pulse" />
+        <div className="absolute top-1/3 -right-32 w-[400px] h-[400px] bg-purple-200/20 rounded-full blur-[100px]" />
+        <div className="absolute -bottom-32 left-1/3 w-[350px] h-[350px] bg-cyan-200/25 rounded-full blur-[100px]" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-purple-200/15 rounded-full blur-[150px]" />
       </div>
 
       {/* Top bar */}
@@ -146,27 +146,27 @@ export default function TutorPage() {
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.5, ease: "easeOut" }}
-        className="relative z-10 flex items-center justify-between px-6 py-3.5 border-b border-white/[0.06] bg-white/[0.03] backdrop-blur-2xl"
+        className="relative z-10 flex items-center justify-between px-6 py-3.5 border-b border-slate-200/60 bg-white/60 backdrop-blur-2xl"
       >
         <Link
           href="/"
-          className="text-lg font-bold tracking-tight bg-gradient-to-r from-white to-white/70 bg-clip-text text-transparent hover:from-white hover:to-white/90 transition-all"
+          className="text-lg font-bold tracking-tight bg-gradient-to-r from-slate-900 to-slate-600 bg-clip-text text-transparent hover:from-slate-800 hover:to-slate-500 transition-all"
         >
           Dialectic
         </Link>
         <div className="flex items-center gap-5">
-          <label className="flex items-center gap-2 text-sm text-white/50 hover:text-white/70 transition-colors cursor-pointer">
+          <label className="flex items-center gap-2 text-sm text-slate-500 hover:text-slate-700 transition-colors cursor-pointer">
             <input
               type="checkbox"
               checked={polling}
               onChange={(e) => setPolling(e.target.checked)}
-              className="rounded bg-white/10 border-white/20 accent-blue-500"
+              className="rounded bg-slate-100 border-slate-300 accent-blue-500"
             />
             Poll Zoom STT
           </label>
           <Link
             href="/test"
-            className="text-sm text-white/30 hover:text-white/60 transition-colors"
+            className="text-sm text-slate-400 hover:text-slate-600 transition-colors"
           >
             API Testing
           </Link>
@@ -233,14 +233,14 @@ export default function TutorPage() {
         transition={{ duration: 0.5, delay: 0.3 }}
         className="relative z-10 flex-1 overflow-hidden px-5 pb-5"
       >
-        <Card className="flex flex-col h-full bg-white/[0.03] backdrop-blur-2xl border-white/[0.06] shadow-[0_8px_40px_rgba(0,0,0,0.4)] rounded-2xl">
+        <Card className="flex flex-col h-full bg-white/60 backdrop-blur-2xl border-slate-200/60 shadow-[0_8px_40px_rgba(0,0,0,0.06)] rounded-2xl">
           <CardHeader className="pb-3 px-5 pt-4">
-            <CardTitle className="text-sm font-semibold text-white/60 uppercase tracking-wider">Message Log</CardTitle>
+            <CardTitle className="text-sm font-semibold text-slate-500 uppercase tracking-wider">Message Log</CardTitle>
           </CardHeader>
           <CardContent className="flex-1 overflow-hidden p-0">
             <div className="h-full overflow-y-auto px-5 pb-4 space-y-2.5">
               {log.length === 0 && (
-                <p className="text-sm text-white/20 text-center pt-10">
+                <p className="text-sm text-slate-400 text-center pt-10">
                   Enable polling and send messages via the Zoom STT API to see
                   them here.
                 </p>
@@ -262,8 +262,8 @@ export default function TutorPage() {
                     {getAgentLabel(msg.agent)}
                   </span>
                   <div className="text-sm">
-                    <span className="font-medium text-white/70">{msg.speaker}:</span>{" "}
-                    <span className="text-white/40">{msg.text}</span>
+                    <span className="font-medium text-slate-700">{msg.speaker}:</span>{" "}
+                    <span className="text-slate-500">{msg.text}</span>
                   </div>
                 </motion.div>
               ))}

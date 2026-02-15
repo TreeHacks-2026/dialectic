@@ -127,9 +127,9 @@ const AvatarPanel = forwardRef<AvatarPanelHandle, AvatarPanelProps>(
       <Card
         className={cn(
           "flex flex-col h-full relative group",
-          "bg-white/5 backdrop-blur-xl border-white/10",
-          "shadow-[0_8px_32px_rgba(0,0,0,0.3)]",
-          "hover:border-white/20 transition-colors"
+          "bg-white/70 backdrop-blur-xl border-slate-200/60",
+          "shadow-[0_8px_32px_rgba(0,0,0,0.06)]",
+          "hover:border-slate-300/80 transition-all duration-300"
         )}
       >
         {/* Gradient accent line at top */}
@@ -147,9 +147,9 @@ const AvatarPanel = forwardRef<AvatarPanelHandle, AvatarPanelProps>(
             className={cn(
               "absolute top-2 right-2 z-10",
               "w-7 h-7 flex items-center justify-center",
-              "rounded-full bg-black/40 backdrop-blur-sm",
-              "text-white/60 hover:text-white hover:bg-red-500/80",
-              "opacity-0 group-hover:opacity-100",
+              "rounded-full bg-white/80 backdrop-blur-sm border border-slate-200/60",
+              "text-slate-400 hover:text-white hover:bg-red-500 hover:border-red-500",
+              "shadow-sm opacity-0 group-hover:opacity-100",
               "transition-all duration-200"
             )}
           >
@@ -164,9 +164,9 @@ const AvatarPanel = forwardRef<AvatarPanelHandle, AvatarPanelProps>(
             className={cn(
               "absolute top-2 right-10 z-10",
               "w-7 h-7 flex items-center justify-center",
-              "rounded-full bg-black/40 backdrop-blur-sm",
-              "text-white/60 hover:text-white hover:bg-white/20",
-              "opacity-0 group-hover:opacity-100",
+              "rounded-full bg-white/80 backdrop-blur-sm border border-slate-200/60",
+              "text-slate-400 hover:text-slate-700 hover:bg-slate-100",
+              "shadow-sm opacity-0 group-hover:opacity-100",
               "transition-all duration-200"
             )}
           >
@@ -175,8 +175,8 @@ const AvatarPanel = forwardRef<AvatarPanelHandle, AvatarPanelProps>(
         )}
 
         <CardContent className="flex-1 flex flex-col items-center justify-center p-4 gap-3">
-          <h3 className="text-sm font-medium text-white/60">{label}</h3>
-          <div className="relative w-full aspect-video bg-black/30 rounded-lg overflow-hidden border border-white/5">
+          <h3 className="text-sm font-medium text-slate-600">{label}</h3>
+          <div className="relative w-full aspect-video bg-slate-100 rounded-xl overflow-hidden border border-slate-200/60 shadow-inner">
             <video
               ref={videoRef}
               className="w-full h-full object-cover"
@@ -185,15 +185,15 @@ const AvatarPanel = forwardRef<AvatarPanelHandle, AvatarPanelProps>(
             />
 
             {status === "idle" && (
-              <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-black/40">
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-white/80 backdrop-blur-sm">
                 <div className="text-4xl">🎓</div>
-                <p className="text-sm text-white/40 text-center px-4">
+                <p className="text-sm text-slate-500 text-center px-4">
                   Start the avatar to get a visual AI tutor experience
                 </p>
                 <Button
                   onClick={initAvatar}
                   size="sm"
-                  className="bg-white/10 hover:bg-white/20 text-white border border-white/10"
+                  className="bg-slate-900 hover:bg-slate-800 text-white"
                 >
                   Start Avatar
                 </Button>
@@ -201,24 +201,24 @@ const AvatarPanel = forwardRef<AvatarPanelHandle, AvatarPanelProps>(
             )}
 
             {status === "connecting" && (
-              <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-black/60">
-                <div className="h-6 w-6 animate-spin rounded-full border-2 border-white/40 border-t-transparent" />
-                <p className="text-sm text-white/40">
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-white/80 backdrop-blur-sm">
+                <div className="h-6 w-6 animate-spin rounded-full border-2 border-slate-400 border-t-transparent" />
+                <p className="text-sm text-slate-500">
                   Connecting to avatar...
                 </p>
               </div>
             )}
 
             {status === "error" && (
-              <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-black/40">
-                <p className="text-sm text-red-400 text-center px-4">
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-white/80 backdrop-blur-sm">
+                <p className="text-sm text-red-500 text-center px-4">
                   {errorMessage}
                 </p>
                 <Button
                   onClick={initAvatar}
                   variant="outline"
                   size="sm"
-                  className="bg-white/5 hover:bg-white/10 text-white border-white/10"
+                  className="bg-white hover:bg-slate-50 text-slate-700 border-slate-300"
                 >
                   Retry
                 </Button>
@@ -231,7 +231,7 @@ const AvatarPanel = forwardRef<AvatarPanelHandle, AvatarPanelProps>(
               onClick={stopAvatar}
               variant="outline"
               size="sm"
-              className="bg-white/5 hover:bg-white/10 text-white border-white/10"
+              className="bg-white hover:bg-slate-50 text-slate-700 border-slate-200 shadow-sm"
             >
               Stop Avatar
             </Button>

@@ -39,7 +39,7 @@ export default function PopoutContainer({
 
     if (pip.isSupported) {
       hasOpened.current = true;
-      pip.open(400, 300).then((win) => {
+      pip.open(480, 360).then((win) => {
         if (!win) {
           // PiP failed to open — restore immediately
           onRestore();
@@ -47,6 +47,18 @@ export default function PopoutContainer({
       });
     }
   }, [isPopped, pip.isSupported]);
+
+  // Style the PiP window body when it becomes available
+  useEffect(() => {
+    if (pip.pipWindow) {
+      const body = pip.pipWindow.document.body;
+      body.style.margin = '0';
+      body.style.padding = '8px';
+      body.style.background = 'linear-gradient(135deg, #f8fafc, #f0f4ff)';
+      body.style.fontFamily = 'var(--font-geist-sans), system-ui, sans-serif';
+      body.style.overflow = 'hidden';
+    }
+  }, [pip.pipWindow]);
 
   // Handle PiP window closed by user (pagehide fires, isOpen becomes false)
   useEffect(() => {
@@ -65,7 +77,12 @@ export default function PopoutContainer({
     return (
       <>
         <PopoutPlaceholder label={label} onRestore={onRestore} />
-        {createPortal(children, pip.pipWindow.document.body)}
+        {createPortal(
+          <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+            {children}
+          </div>,
+          pip.pipWindow.document.body
+        )}
       </>
     );
   }

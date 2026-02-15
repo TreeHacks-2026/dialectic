@@ -16,12 +16,12 @@ export default function AddAgentCard({ onClick, disabled }: AddAgentCardProps) {
       className={cn(
         "flex flex-col items-center justify-center gap-3",
         "aspect-video w-full rounded-2xl",
-        "border border-dashed border-white/[0.08]",
-        "bg-white/[0.02] backdrop-blur-sm",
+        "border border-dashed border-slate-200/60",
+        "bg-white/40 backdrop-blur-sm",
         "transition-all duration-300 ease-out",
         !disabled && [
-          "hover:border-white/20 hover:bg-white/[0.05]",
-          "hover:shadow-[0_0_30px_rgba(59,130,246,0.08)]",
+          "hover:border-slate-300/80 hover:bg-white/70",
+          "hover:shadow-[0_4px_20px_rgba(0,0,0,0.06)]",
           "hover:scale-[1.01] active:scale-[0.99]",
           "cursor-pointer group",
         ],
@@ -31,14 +31,14 @@ export default function AddAgentCard({ onClick, disabled }: AddAgentCardProps) {
       <div
         className={cn(
           "flex items-center justify-center w-14 h-14 rounded-full",
-          "bg-white/[0.04] border border-white/[0.08]",
+          "bg-slate-100/60 border border-slate-200/60",
           "transition-all duration-300",
-          !disabled && "group-hover:bg-white/[0.08] group-hover:border-white/15 group-hover:scale-110"
+          !disabled && "group-hover:bg-slate-100 group-hover:border-slate-300/80 group-hover:scale-110"
         )}
       >
-        <Plus className="w-6 h-6 text-white/30 group-hover:text-white/60 transition-colors duration-300" />
+        <Plus className="w-6 h-6 text-slate-400 group-hover:text-slate-600 transition-colors duration-300" />
       </div>
-      <span className="text-sm font-medium text-white/30 group-hover:text-white/50 transition-colors duration-300">
+      <span className="text-sm font-medium text-slate-400 group-hover:text-slate-600 transition-colors duration-300">
         Add Agent
       </span>
     </button>

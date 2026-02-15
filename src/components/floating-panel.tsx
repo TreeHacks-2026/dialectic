@@ -27,7 +27,7 @@ export default function FloatingPanel({
       exit={{ opacity: 0, scale: 0.8 }}
       className={cn(
         "fixed z-[9999] w-[360px] shadow-2xl rounded-xl border overflow-hidden",
-        "bg-card border-white/10"
+        "bg-white/90 backdrop-blur-xl border-slate-200/60"
       )}
       style={{ top: 0, left: 0 }}
     >
@@ -35,10 +35,10 @@ export default function FloatingPanel({
       <div
         className={cn(
           "flex items-center justify-between px-3 py-2",
-          "bg-white/5 border-b border-white/10 cursor-grab active:cursor-grabbing"
+          "bg-slate-50/80 border-b border-slate-200/60 cursor-grab active:cursor-grabbing"
         )}
       >
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+        <div className="flex items-center gap-2 text-sm text-slate-600">
           <GripHorizontal className="h-4 w-4" />
           <span className="font-medium truncate">{label}</span>
         </div>
@@ -46,7 +46,7 @@ export default function FloatingPanel({
           onClick={onClose}
           className={cn(
             "p-1 rounded-md transition-colors",
-            "text-muted-foreground hover:text-foreground hover:bg-white/10"
+            "text-slate-400 hover:text-slate-700 hover:bg-slate-100"
           )}
         >
           <Minimize2 className="h-4 w-4" />
