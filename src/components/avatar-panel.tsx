@@ -8,6 +8,10 @@ import {
   useRef,
   useState,
 } from "react";
+import {
+  LiveAvatarSession,
+  SessionEvent,
+} from "@heygen/liveavatar-web-sdk";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
@@ -30,14 +34,14 @@ const AvatarPanel = forwardRef<AvatarPanelHandle, AvatarPanelProps>(
   ) {
     const [status, setStatus] = useState<AvatarStatus>("idle");
     const [errorMessage, setErrorMessage] = useState("");
-    const avatarRef = useRef<any>(null);
+    const sessionRef = useRef<LiveAvatarSession | null>(null);
     const videoRef = useRef<HTMLVideoElement>(null);
 
     useImperativeHandle(ref, () => ({
       async speak(text: string) {
-        if (!avatarRef.current) return;
+        if (!sessionRef.current) return;
         try {
-          await avatarRef.current.speak({ text });
+          sessionRef.current.repeat(text);
         } catch (err) {
           console.error("Avatar speak error:", err);
         }
@@ -54,44 +58,28 @@ const AvatarPanel = forwardRef<AvatarPanelHandle, AvatarPanelProps>(
           const data = await res.json().catch(() => ({}));
           throw new Error(data.error || "Failed to create session");
         }
-        const { access_token } = await res.json();
+        const { session_token } = await res.json();
 
-        const mod = await import("@heygen/streaming-avatar");
-        const StreamingAvatar = mod.default;
-        const { AvatarQuality, StreamingEvents } = mod;
+        const session = new LiveAvatarSession(session_token, {
+          voiceChat: false,
+        });
+        sessionRef.current = session;
 
-        const avatar = new StreamingAvatar({ token: access_token });
-        avatarRef.current = avatar;
-
-        avatar.on(StreamingEvents.STREAM_READY, (event: unknown) => {
-          console.log("[AvatarPanel] STREAM_READY fired", event);
-          const detail = (event as CustomEvent)?.detail;
-          const stream: MediaStream | null =
-            (detail instanceof MediaStream ? detail : null) ??
-            (avatar as unknown as { mediaStream: MediaStream | null }).mediaStream;
-
-          console.log("[AvatarPanel] resolved stream:", stream);
-          if (stream && videoRef.current) {
-            videoRef.current.srcObject = stream;
-            videoRef.current.onloadedmetadata = () => {
-              videoRef.current?.play().catch(console.error);
-            };
+        session.on(SessionEvent.SESSION_STREAM_READY, () => {
+          console.log("[AvatarPanel] SESSION_STREAM_READY fired");
+          if (videoRef.current) {
+            session.attach(videoRef.current);
           }
           setStatus("connected");
           onReady?.();
         });
 
-        avatar.on(StreamingEvents.STREAM_DISCONNECTED, () => {
+        session.on(SessionEvent.SESSION_DISCONNECTED, () => {
           setStatus("idle");
-          if (videoRef.current) {
-            videoRef.current.srcObject = null;
-          }
+          sessionRef.current = null;
         });
 
-        await avatar.createStartAvatar({
-          quality: AvatarQuality.Medium,
-          avatarName,
-        });
+        await session.start();
       } catch (err) {
         console.error("Avatar init error:", err);
         setErrorMessage(
@@ -102,19 +90,16 @@ const AvatarPanel = forwardRef<AvatarPanelHandle, AvatarPanelProps>(
     }, [avatarName, onReady]);
 
     const stopAvatar = useCallback(async () => {
-      if (avatarRef.current) {
-        await avatarRef.current.stopAvatar();
-        avatarRef.current = null;
-      }
-      if (videoRef.current) {
-        videoRef.current.srcObject = null;
+      if (sessionRef.current) {
+        await sessionRef.current.stop();
+        sessionRef.current = null;
       }
       setStatus("idle");
     }, []);
 
     useEffect(() => {
       return () => {
-        avatarRef.current?.stopAvatar().catch(() => {});
+        sessionRef.current?.stop().catch(() => {});
       };
     }, []);
 

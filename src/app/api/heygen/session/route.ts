@@ -12,39 +12,46 @@ export async function POST() {
 
   try {
     const response = await fetch(
-      "https://api.heygen.com/v1/streaming.create_token",
+      "https://api.liveavatar.com/v1/sessions/token",
       {
         method: "POST",
         headers: {
-          "x-api-key": apiKey,
+          "X-API-KEY": apiKey,
+          "Content-Type": "application/json",
         },
+        body: JSON.stringify({
+          mode: "LITE",
+          avatar_id: "default",
+          is_sandbox: true,
+        }),
       }
     );
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("HeyGen API error:", response.status, errorText);
+      console.error("LiveAvatar API error:", response.status, errorText);
       return NextResponse.json(
-        { error: "Failed to create HeyGen session" },
+        { error: "Failed to create LiveAvatar session" },
         { status: response.status }
       );
     }
 
     const result = await response.json();
-    const token = result.data?.token;
+    const sessionToken = result.data?.session_token;
+    const sessionId = result.data?.session_id;
 
-    if (!token) {
+    if (!sessionToken || !sessionId) {
       return NextResponse.json(
-        { error: "No token returned from HeyGen" },
+        { error: "No session token returned from LiveAvatar" },
         { status: 500 }
       );
     }
 
-    return NextResponse.json({ access_token: token });
+    return NextResponse.json({ session_token: sessionToken, session_id: sessionId });
   } catch (error) {
-    console.error("HeyGen session error:", error);
+    console.error("LiveAvatar session error:", error);
     return NextResponse.json(
-      { error: "Internal server error creating HeyGen session" },
+      { error: "Internal server error creating LiveAvatar session" },
       { status: 500 }
     );
   }

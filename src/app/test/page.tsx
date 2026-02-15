@@ -313,7 +313,7 @@ function HeyGenTab() {
   return (
     <div className="space-y-4">
       <p className="text-sm text-muted-foreground">
-        Creates a HeyGen streaming session token via POST /api/heygen/session.
+        Creates a LiveAvatar session token via POST /api/heygen/session.
       </p>
       <Button onClick={testSession} disabled={loading}>
         {loading ? "Creating session..." : "Test HeyGen Session"}
