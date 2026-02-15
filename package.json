@@ -9,7 +9,7 @@
     "dev": "next dev",
     "build": "npm run build:transcript && next build",
     "build:transcript": "npm run build --workspace=@dialectic/transcript-service",
-    "start": "next start",
+    "start": "node server.js",
     "lint": "eslint .",
     "dev:transcript": "npm run dev --workspace=@dialectic/transcript-service",
     "install:all": "npm install"
