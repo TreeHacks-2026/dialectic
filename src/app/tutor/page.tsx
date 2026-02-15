@@ -6,13 +6,11 @@ import Link from "next/link";
 import AvatarPanel, {
   type AvatarPanelHandle,
 } from "@/components/avatar-panel";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { getDialogueConfig, clearDialogueConfig, type DialogueConfig } from "@/lib/dialogue-config";
 
 interface SttMessage {
-  agentId: string; // Changed from agent: "agent1" | "agent2" | "agent3"
+  agentId: string;
   speaker: string;
   text: string;
   timestamp: string;
@@ -22,9 +20,7 @@ export default function TutorPage() {
   const router = useRouter();
   const [config, setConfig] = useState<DialogueConfig | null>(null);
   const agentRefsMap = useRef<Map<string, React.RefObject<AvatarPanelHandle>>>(new Map());
-  const [log, setLog] = useState<SttMessage[]>([]);
   const [polling, setPolling] = useState(true); // Automatically enabled
-  const logEndRef = useRef<HTMLDivElement>(null);
   const [refsReady, setRefsReady] = useState(false);
 
   // Load configuration on mount
@@ -50,11 +46,6 @@ export default function TutorPage() {
     setRefsReady(true);
   }, [router]);
 
-  // Auto-scroll the log
-  useEffect(() => {
-    logEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [log]);
-
   // Polling loop
   useEffect(() => {
     if (!polling || !config || !refsReady) return;
@@ -67,8 +58,6 @@ export default function TutorPage() {
         const messages: SttMessage[] = data.messages ?? [];
 
         if (messages.length === 0) return;
-
-        setLog((prev) => [...prev, ...messages]);
 
         // Route messages to correct avatar panels using agent IDs
         for (const msg of messages) {
@@ -90,15 +79,6 @@ export default function TutorPage() {
 
     return () => clearInterval(interval);
   }, [polling, config, refsReady]);
-
-  const agentBadgeColor = (agentId: string, index: number) => {
-    const colors: Array<"default" | "secondary" | "outline"> = ["default", "secondary", "outline"];
-    return colors[index % colors.length];
-  };
-
-  const getAgentName = (agentId: string): string => {
-    return config?.agents.find(a => a.id === agentId)?.name || agentId;
-  };
 
   const handleEndSession = () => {
     // Clear frontend session config to allow fresh start with different avatars
@@ -140,8 +120,8 @@ export default function TutorPage() {
         </div>
       </header>
 
-      {/* Avatars grid - dynamically rendered */}
-      <div className={`grid gap-4 p-4 ${
+      {/* Avatars grid - dynamically rendered, takes full remaining space */}
+      <div className={`flex-1 grid gap-4 p-4 ${
         config.agents.length === 1 ? 'grid-cols-1' :
         config.agents.length === 2 ? 'grid-cols-1 md:grid-cols-2' :
         'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
@@ -158,42 +138,6 @@ export default function TutorPage() {
             />
           );
         })}
-      </div>
-
-      {/* Message log */}
-      <div className="flex-1 overflow-hidden px-4 pb-4">
-        <Card className="flex flex-col h-full">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base">Message Log</CardTitle>
-          </CardHeader>
-          <CardContent className="flex-1 overflow-hidden p-0">
-            <div className="h-full overflow-y-auto px-6 pb-4 space-y-3">
-              {log.length === 0 && (
-                <p className="text-sm text-muted-foreground text-center pt-8">
-                  Enable polling and send messages via the Zoom STT API to see
-                  them here.
-                </p>
-              )}
-
-              {log.map((msg, i) => (
-                <div key={i} className="flex items-start gap-2">
-                  <Badge
-                    variant={agentBadgeColor(msg.agentId, i) as "default" | "secondary" | "outline"}
-                    className="shrink-0 mt-0.5"
-                  >
-                    {getAgentName(msg.agentId)}
-                  </Badge>
-                  <div className="text-sm">
-                    <span className="font-medium">{msg.speaker}:</span>{" "}
-                    <span className="text-muted-foreground">{msg.text}</span>
-                  </div>
-                </div>
-              ))}
-
-              <div ref={logEndRef} />
-            </div>
-          </CardContent>
-        </Card>
       </div>
     </div>
   );
