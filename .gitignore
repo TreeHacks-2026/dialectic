@@ -15,6 +15,9 @@ dist/
 /.next/
 /out/
 
+# analysis storage
+/data/
+
 # production
 /build
 

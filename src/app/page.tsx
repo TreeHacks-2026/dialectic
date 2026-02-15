@@ -53,6 +53,18 @@ export default function Home() {
             </CardHeader>
           </Card>
         </Link>
+
+        <Link href="/analyses" className="block">
+          <Card className="h-full hover:shadow-lg transition-shadow cursor-pointer border-2 hover:border-primary/40">
+            <CardHeader>
+              <CardTitle className="text-lg">Stored Analyses</CardTitle>
+              <CardDescription>
+                View and manage automatically generated analysis results from past
+                meetings. Analyses are created when meetings end.
+              </CardDescription>
+            </CardHeader>
+          </Card>
+        </Link>
       </div>
 
       <Button asChild size="lg">

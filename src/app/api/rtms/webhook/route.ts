@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 // Import RTMSClient from source - Next.js will transpile it
 import { RTMSClient } from '../../../../../packages/transcript-service/src/rtms-client';
 import { meetingTranscriptManager } from '@/lib/meeting-transcript';
+import { saveAnalysis } from '@/lib/analysis-storage';
 
 // Singleton RTMS client
 let rtmsClient: RTMSClient | null = null;
@@ -190,11 +191,19 @@ async function triggerMeetingAnalysis(sessionId: string): Promise<void> {
     }
 
     const analysisResult = await analyzeResponse.json();
+    const results = analysisResult.results || [analysisResult];
+    
     console.log(`[RTMS API] ✅ Analysis complete for session ${sessionId}`);
-    console.log(`[RTMS API] 📊 Analyzed ${analysisResult.results?.length || 0} students`);
+    console.log(`[RTMS API] 📊 Analyzed ${results.length} students`);
 
-    // Store analysis result (you can extend this to save to database or notify users)
-    // For now, we just log it. You could emit an event or store it.
+    // Store analysis result in database
+    try {
+      const stored = saveAnalysis(sessionId, plainText, results);
+      console.log(`[RTMS API] 💾 Stored analysis with ID: ${stored.id}`);
+    } catch (error) {
+      console.error('[RTMS API] ❌ Error storing analysis:', error);
+      // Don't fail the whole process if storage fails
+    }
     
   } catch (error) {
     console.error('[RTMS API] ❌ Error triggering analysis:', error);
