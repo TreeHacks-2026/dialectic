@@ -228,6 +228,58 @@ function CoursesTab() {
   );
 }
 
+function ZoomSttTab() {
+  const [speaker, setSpeaker] = useState("John");
+  const [text, setText] = useState("Hello, this is a test of the Zoom speech-to-text endpoint.");
+  const [result, setResult] = useState<ApiResult | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  const testZoomStt = async () => {
+    setLoading(true);
+    setResult(null);
+    const res = await apiCall("/api/zoom-stt", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ speaker, text }),
+    });
+    setResult(res);
+    setLoading(false);
+  };
+
+  return (
+    <div className="space-y-4">
+      <p className="text-sm text-muted-foreground">
+        Sends a speaker + text payload to POST /api/zoom-stt and returns a dummy confirmation.
+      </p>
+      <div className="space-y-3">
+        <div>
+          <Label htmlFor="zoom-speaker">Speaker</Label>
+          <Input
+            id="zoom-speaker"
+            value={speaker}
+            onChange={(e) => setSpeaker(e.target.value)}
+            placeholder="Speaker name"
+          />
+        </div>
+        <div>
+          <Label htmlFor="zoom-text">Text</Label>
+          <Textarea
+            id="zoom-text"
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            rows={3}
+            placeholder="What the speaker said..."
+          />
+        </div>
+      </div>
+      <Button onClick={testZoomStt} disabled={loading || !speaker || !text}>
+        {loading ? "Sending..." : "Test Zoom STT"}
+      </Button>
+      <ResultDisplay result={result} />
+    </div>
+  );
+}
+
 function HeyGenTab() {
   const [result, setResult] = useState<ApiResult | null>(null);
   const [loading, setLoading] = useState(false);
@@ -281,12 +333,13 @@ export default function TestPage() {
         <Separator />
 
         <Tabs defaultValue="connection">
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full grid-cols-6">
             <TabsTrigger value="connection">Connection</TabsTrigger>
             <TabsTrigger value="ingest">Ingest</TabsTrigger>
             <TabsTrigger value="search">Search</TabsTrigger>
             <TabsTrigger value="courses">Courses</TabsTrigger>
             <TabsTrigger value="heygen">HeyGen</TabsTrigger>
+            <TabsTrigger value="zoom-stt">Zoom STT</TabsTrigger>
           </TabsList>
 
           <Card className="mt-4">
@@ -305,6 +358,9 @@ export default function TestPage() {
               </TabsContent>
               <TabsContent value="heygen" className="mt-0">
                 <HeyGenTab />
+              </TabsContent>
+              <TabsContent value="zoom-stt" className="mt-0">
+                <ZoomSttTab />
               </TabsContent>
             </CardContent>
           </Card>
