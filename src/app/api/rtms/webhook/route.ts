@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 // Import RTMSClient from source - Next.js will transpile it
-import { RTMSClient } from '../../../../packages/transcript-service/src/rtms-client';
+import { RTMSClient } from '../../../../../packages/transcript-service/src/rtms-client';
 
 // Singleton RTMS client
 let rtmsClient: RTMSClient | null = null;
