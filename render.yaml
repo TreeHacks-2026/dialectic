@@ -3,7 +3,7 @@ services:
     name: dialectic
     runtime: node
     plan: free
-    buildCommand: npm ci && npm run build --workspace=@dialectic/transcript-service && npm run build --workspace=@dialectic/transcript-service && npm run build
+    buildCommand: npm ci && npm run build
     startCommand: npm start
     healthCheckPath: /api/courses
     envVars:
