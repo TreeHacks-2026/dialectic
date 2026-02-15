@@ -21,8 +21,8 @@ export async function POST() {
         },
         body: JSON.stringify({
           mode: "LITE",
-          avatar_id: "default",
-          is_sandbox: true,
+          avatar_id: "b6c94c07-e4e5-483e-8bec-e838d5910b7d",
+          is_sandbox: false,
         }),
       }
     );
