@@ -5,7 +5,7 @@ services:
     plan: free
     buildCommand: npm ci && npm run build
     startCommand: npm start
-    healthCheckPath: /api/courses
+    healthCheckPath: /api/rtms/webhook
     envVars:
       - key: ELASTICSEARCH_URL
         sync: false
