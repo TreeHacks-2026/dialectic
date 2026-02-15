@@ -1,19 +1,58 @@
+"use client";
+
 import Link from "next/link";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { ChevronDown, ArrowDownUp, Building2, Briefcase, User, Mic, Video, Share2 } from "lucide-react";
+import { ChevronDown, ArrowDownUp, Building2, Briefcase, Mic, Video, Share2 } from "lucide-react";
+import { motion } from "framer-motion";
+import { DotPattern, GridPattern, AnimatedBeams } from "@/components/ui/animated-background";
 
 export default function Home() {
   return (
-    <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-blue-50 via-cyan-50 to-sky-100">
-      {/* Animated Blue Background */}
+    <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-white via-blue-50/30 to-cyan-50/20">
+      {/* Aceternity Animated Background */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -left-20 top-20 h-96 w-96 animate-blob rounded-full bg-blue-300/30 mix-blend-multiply blur-3xl filter" />
-        <div className="animation-delay-2000 absolute right-20 top-40 h-96 w-96 animate-blob rounded-full bg-cyan-300/30 mix-blend-multiply blur-3xl filter" />
-        <div className="animation-delay-4000 absolute bottom-20 left-1/3 h-96 w-96 animate-blob rounded-full bg-sky-300/30 mix-blend-multiply blur-3xl filter" />
+        <DotPattern className="text-blue-400/20" />
+        <GridPattern className="text-cyan-400/10" strokeDasharray="4 2" />
+        <AnimatedBeams />
+        <div className="absolute -left-20 top-20 h-96 w-96 animate-blob rounded-full bg-blue-400/20 mix-blend-multiply blur-3xl filter" />
+        <div className="animation-delay-2000 absolute right-20 top-40 h-96 w-96 animate-blob rounded-full bg-cyan-400/15 mix-blend-multiply blur-3xl filter" />
+        <div className="animation-delay-4000 absolute bottom-20 left-1/3 h-96 w-96 animate-blob rounded-full bg-sky-400/15 mix-blend-multiply blur-3xl filter" />
+      </div>
+
+      {/* Glassmorphic Taskbar */}
+      <div className="fixed bottom-8 left-1/2 z-50 -translate-x-1/2">
+        <motion.div
+          initial={{ y: 100, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.5, duration: 0.5 }}
+          className="rounded-2xl border border-white/40 bg-white/30 px-6 py-3 shadow-2xl backdrop-blur-xl"
+        >
+          <div className="flex items-center gap-4">
+            <button className="flex h-12 w-12 items-center justify-center rounded-xl bg-white/40 transition-all hover:bg-white/60">
+              <Video className="h-5 w-5 text-blue-600" />
+            </button>
+            <button className="flex h-12 w-12 items-center justify-center rounded-xl bg-white/40 transition-all hover:bg-white/60">
+              <Mic className="h-5 w-5 text-blue-600" />
+            </button>
+            <button className="flex h-12 w-12 items-center justify-center rounded-xl bg-white/40 transition-all hover:bg-white/60">
+              <Share2 className="h-5 w-5 text-blue-600" />
+            </button>
+            <div className="mx-2 h-8 w-px bg-white/40" />
+            <button className="rounded-xl bg-red-500/80 px-6 py-3 text-sm font-semibold text-white backdrop-blur-sm transition-all hover:bg-red-600">
+              Leave
+            </button>
+          </div>
+        </motion.div>
       </div>
       {/* Header */}
       <header className="relative z-10 mx-auto max-w-7xl px-6 py-8">
-        <div className="flex items-center justify-between">
+        <motion.div
+          initial={{ y: -20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.5 }}
+          className="flex items-center justify-between"
+        >
           <div className="flex items-center gap-12">
             <h1 className="text-2xl font-bold tracking-tight text-blue-600">RNT</h1>
             
@@ -41,130 +80,184 @@ export default function Home() {
               Get started
             </Button>
           </div>
-        </div>
+        </motion.div>
       </header>
 
       {/* Hero Section */}
       <main className="relative z-10 mx-auto max-w-7xl px-6 pb-12 pt-8">
         <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
-          {/* Left Side - Zoom Meeting Interface */}
-          <div className="relative flex items-center justify-center">
-            <div className="w-full max-w-xl space-y-4">
-              {/* Zoom Meeting Container with Glassmorphism */}
-              <div className="relative overflow-hidden rounded-3xl border border-white/40 bg-white/20 p-6 shadow-2xl backdrop-blur-xl">
-                {/* Meeting Grid - 2x2 */}
-                <div className="grid grid-cols-2 gap-3">
-                  {/* Participant 1 */}
-                  <div className="group relative aspect-video overflow-hidden rounded-xl bg-gradient-to-br from-blue-400 to-blue-600">
-                    <div className="flex h-full items-center justify-center">
-                      <div className="flex h-20 w-20 items-center justify-center rounded-full bg-blue-700/50 backdrop-blur-sm">
-                        <User className="h-10 w-10 text-white" />
-                      </div>
-                    </div>
-                    <div className="absolute bottom-2 left-2 rounded-md bg-black/60 px-2 py-1 text-xs font-medium text-white backdrop-blur-sm">
-                      Sarah K.
-                    </div>
-                    <div className="absolute right-2 top-2 opacity-0 transition-opacity group-hover:opacity-100">
-                      <div className="flex gap-1">
-                        <button className="rounded-md bg-black/60 p-1.5 backdrop-blur-sm hover:bg-black/80">
-                          <Mic className="h-3 w-3 text-white" />
-                        </button>
-                      </div>
-                    </div>
+          {/* Left Side - Scattered Zoom Meeting Interface */}
+          <div className="relative flex min-h-[600px] items-center justify-center">
+            <div className="relative h-full w-full max-w-xl">
+              {/* Participant 1 - Top Left */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8, x: -50, y: -50 }}
+                animate={{ opacity: 1, scale: 1, x: 0, y: 0 }}
+                transition={{ delay: 0.1, duration: 0.5 }}
+                className="absolute left-0 top-0 z-30"
+              >
+                <div className="group relative h-40 w-56 overflow-hidden rounded-2xl border-2 border-white/60 bg-gradient-to-br from-white/90 to-white/70 shadow-2xl backdrop-blur-xl">
+                  <Image
+                    src="/participant-1.jpg"
+                    alt="Sarah K."
+                    fill
+                    className="object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+                  <div className="absolute bottom-2 left-2 rounded-lg bg-black/60 px-2 py-1 text-xs font-semibold text-white backdrop-blur-sm">
+                    Sarah K.
                   </div>
-
-                  {/* Participant 2 */}
-                  <div className="group relative aspect-video overflow-hidden rounded-xl bg-gradient-to-br from-cyan-400 to-cyan-600">
-                    <div className="flex h-full items-center justify-center">
-                      <div className="flex h-20 w-20 items-center justify-center rounded-full bg-cyan-700/50 backdrop-blur-sm">
-                        <User className="h-10 w-10 text-white" />
-                      </div>
-                    </div>
-                    <div className="absolute bottom-2 left-2 rounded-md bg-black/60 px-2 py-1 text-xs font-medium text-white backdrop-blur-sm">
-                      Michael P.
-                    </div>
-                    <div className="absolute right-2 top-2 opacity-0 transition-opacity group-hover:opacity-100">
-                      <div className="flex gap-1">
-                        <button className="rounded-md bg-black/60 p-1.5 backdrop-blur-sm hover:bg-black/80">
-                          <Mic className="h-3 w-3 text-white" />
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Participant 3 */}
-                  <div className="group relative aspect-video overflow-hidden rounded-xl bg-gradient-to-br from-sky-400 to-sky-600">
-                    <div className="flex h-full items-center justify-center">
-                      <div className="flex h-20 w-20 items-center justify-center rounded-full bg-sky-700/50 backdrop-blur-sm">
-                        <User className="h-10 w-10 text-white" />
-                      </div>
-                    </div>
-                    <div className="absolute bottom-2 left-2 rounded-md bg-black/60 px-2 py-1 text-xs font-medium text-white backdrop-blur-sm">
-                      Emma L.
-                    </div>
-                    <div className="absolute right-2 top-2 opacity-0 transition-opacity group-hover:opacity-100">
-                      <div className="flex gap-1">
-                        <button className="rounded-md bg-black/60 p-1.5 backdrop-blur-sm hover:bg-black/80">
-                          <Mic className="h-3 w-3 text-white" />
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Participant 4 - Active Speaker with Border */}
-                  <div className="group relative aspect-video overflow-hidden rounded-xl border-2 border-blue-400 bg-gradient-to-br from-indigo-400 to-indigo-600">
-                    <div className="flex h-full items-center justify-center">
-                      <div className="flex h-20 w-20 items-center justify-center rounded-full bg-indigo-700/50 backdrop-blur-sm">
-                        <User className="h-10 w-10 text-white" />
-                      </div>
-                    </div>
-                    <div className="absolute bottom-2 left-2 rounded-md bg-black/60 px-2 py-1 text-xs font-medium text-white backdrop-blur-sm">
-                      Alex R. (You)
-                    </div>
-                    <div className="absolute right-2 top-2 opacity-0 transition-opacity group-hover:opacity-100">
-                      <div className="flex gap-1">
-                        <button className="rounded-md bg-black/60 p-1.5 backdrop-blur-sm hover:bg-black/80">
-                          <Mic className="h-3 w-3 text-white" />
-                        </button>
-                      </div>
-                    </div>
+                  <div className="absolute right-2 top-2 opacity-0 transition-opacity group-hover:opacity-100">
+                    <button className="rounded-lg bg-white/90 p-1.5 backdrop-blur-sm hover:bg-white">
+                      <Mic className="h-3 w-3 text-blue-600" />
+                    </button>
                   </div>
                 </div>
+              </motion.div>
 
-                {/* Meeting Controls Bar */}
-                <div className="mt-4 flex items-center justify-center gap-3">
-                  <button className="flex items-center gap-2 rounded-xl bg-white/30 px-4 py-2.5 backdrop-blur-md transition-all hover:bg-white/40">
-                    <Mic className="h-4 w-4 text-white" />
-                    <span className="text-xs font-medium text-white">Mute</span>
-                  </button>
-                  <button className="flex items-center gap-2 rounded-xl bg-white/30 px-4 py-2.5 backdrop-blur-md transition-all hover:bg-white/40">
-                    <Video className="h-4 w-4 text-white" />
-                    <span className="text-xs font-medium text-white">Video</span>
-                  </button>
-                  <button className="flex items-center gap-2 rounded-xl bg-white/30 px-4 py-2.5 backdrop-blur-md transition-all hover:bg-white/40">
-                    <Share2 className="h-4 w-4 text-white" />
-                    <span className="text-xs font-medium text-white">Share</span>
-                  </button>
+              {/* Participant 2 - Top Right */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8, x: 50, y: -50 }}
+                animate={{ opacity: 1, scale: 1, x: 0, y: 0 }}
+                transition={{ delay: 0.2, duration: 0.5 }}
+                className="absolute right-0 top-12 z-20"
+              >
+                <div className="group relative h-36 w-52 overflow-hidden rounded-2xl border-2 border-white/60 bg-gradient-to-br from-white/90 to-white/70 shadow-2xl backdrop-blur-xl">
+                  <Image
+                    src="/participant-2.jpg"
+                    alt="Michael P."
+                    fill
+                    className="object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+                  <div className="absolute bottom-2 left-2 rounded-lg bg-black/60 px-2 py-1 text-xs font-semibold text-white backdrop-blur-sm">
+                    Michael P.
+                  </div>
+                  <div className="absolute right-2 top-2 opacity-0 transition-opacity group-hover:opacity-100">
+                    <button className="rounded-lg bg-white/90 p-1.5 backdrop-blur-sm hover:bg-white">
+                      <Mic className="h-3 w-3 text-blue-600" />
+                    </button>
+                  </div>
                 </div>
-              </div>
+              </motion.div>
+
+              {/* Participant 3 - Center Large (Active Speaker) */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.3, duration: 0.5 }}
+                className="absolute left-1/2 top-1/2 z-40 -translate-x-1/2 -translate-y-1/2"
+              >
+                <div className="group relative h-52 w-72 overflow-hidden rounded-3xl border-4 border-blue-400 bg-gradient-to-br from-white/95 to-white/80 shadow-2xl backdrop-blur-xl">
+                  <Image
+                    src="/participant-3.jpg"
+                    alt="Emma L."
+                    fill
+                    className="object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+                  <div className="absolute bottom-3 left-3 rounded-lg bg-black/70 px-3 py-1.5 text-sm font-bold text-white backdrop-blur-sm">
+                    Emma L. (Speaking)
+                  </div>
+                  <div className="absolute right-3 top-3 opacity-0 transition-opacity group-hover:opacity-100">
+                    <button className="rounded-lg bg-white/90 p-2 backdrop-blur-sm hover:bg-white">
+                      <Mic className="h-4 w-4 text-blue-600" />
+                    </button>
+                  </div>
+                </div>
+              </motion.div>
+
+              {/* Participant 4 - Bottom Left */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8, x: -50, y: 50 }}
+                animate={{ opacity: 1, scale: 1, x: 0, y: 0 }}
+                transition={{ delay: 0.4, duration: 0.5 }}
+                className="absolute bottom-8 left-4 z-30"
+              >
+                <div className="group relative h-36 w-48 overflow-hidden rounded-2xl border-2 border-white/60 bg-gradient-to-br from-white/90 to-white/70 shadow-2xl backdrop-blur-xl">
+                  <Image
+                    src="/participant-4.jpg"
+                    alt="Alex R."
+                    fill
+                    className="object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+                  <div className="absolute bottom-2 left-2 rounded-lg bg-black/60 px-2 py-1 text-xs font-semibold text-white backdrop-blur-sm">
+                    Alex R.
+                  </div>
+                  <div className="absolute right-2 top-2 opacity-0 transition-opacity group-hover:opacity-100">
+                    <button className="rounded-lg bg-white/90 p-1.5 backdrop-blur-sm hover:bg-white">
+                      <Mic className="h-3 w-3 text-blue-600" />
+                    </button>
+                  </div>
+                </div>
+              </motion.div>
+
+              {/* Participant 5 - Bottom Right */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8, x: 50, y: 50 }}
+                animate={{ opacity: 1, scale: 1, x: 0, y: 0 }}
+                transition={{ delay: 0.5, duration: 0.5 }}
+                className="absolute bottom-0 right-8 z-10"
+              >
+                <div className="group relative h-32 w-44 overflow-hidden rounded-2xl border-2 border-white/60 bg-gradient-to-br from-white/90 to-white/70 shadow-2xl backdrop-blur-xl">
+                  <Image
+                    src="/participant-5.jpg"
+                    alt="Jessica M."
+                    fill
+                    className="object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+                  <div className="absolute bottom-2 left-2 rounded-lg bg-black/60 px-2 py-1 text-xs font-semibold text-white backdrop-blur-sm">
+                    Jessica M.
+                  </div>
+                  <div className="absolute right-2 top-2 opacity-0 transition-opacity group-hover:opacity-100">
+                    <button className="rounded-lg bg-white/90 p-1.5 backdrop-blur-sm hover:bg-white">
+                      <Mic className="h-3 w-3 text-blue-600" />
+                    </button>
+                  </div>
+                </div>
+              </motion.div>
 
               {/* Floating Badge */}
-              <div className="mx-auto w-fit rounded-full border border-blue-200/40 bg-white/40 px-4 py-2 backdrop-blur-md">
-                <p className="text-sm font-medium text-blue-900">Connect with top designers remotely</p>
-              </div>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.8, duration: 0.5 }}
+                className="absolute -bottom-16 left-1/2 -translate-x-1/2"
+              >
+                <div className="rounded-full border border-white/60 bg-white/50 px-6 py-2 backdrop-blur-xl">
+                  <p className="text-sm font-semibold text-blue-900">Connect with top designers remotely</p>
+                </div>
+              </motion.div>
             </div>
           </div>
 
           {/* Right Side - Exchange Interface */}
-          <div className="space-y-8">
-            <div className="space-y-4">
+          <motion.div
+            initial={{ opacity: 0, x: 50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.3, duration: 0.6 }}
+            className="space-y-8"
+          >
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5, duration: 0.5 }}
+              className="space-y-4"
+            >
               <h2 className="text-balance text-5xl font-bold leading-tight tracking-tight text-foreground lg:text-6xl">
                 Find, match, and hire designers secure
               </h2>
-            </div>
+            </motion.div>
 
             {/* Exchange Card */}
-            <div className="rounded-3xl border border-white/40 bg-white/80 p-8 shadow-2xl backdrop-blur-xl">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6, duration: 0.5 }}
+              className="rounded-3xl border border-white/40 bg-white/80 p-8 shadow-2xl backdrop-blur-xl"
+            >
               <div className="space-y-6">
                 {/* Tabs */}
                 <div className="flex gap-2">
@@ -235,8 +328,8 @@ export default function Home() {
                   Search now
                 </Button>
               </div>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
         </div>
       </main>
 
