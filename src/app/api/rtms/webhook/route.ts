@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { RTMSClient } from '@dialectic/transcript-service';
+// Import RTMSClient directly from the built package
+import { RTMSClient } from '../../../../packages/transcript-service/dist/rtms-client.js';
 
 // Singleton RTMS client
 let rtmsClient: RTMSClient | null = null;
