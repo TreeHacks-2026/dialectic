@@ -1,4 +1,4 @@
-import { AgentResponse } from "./types";
+import { AgentResponse } from "./src/types/types";
 
 /**
  * Individual agent that processes queries
@@ -34,10 +34,7 @@ export class Agent {
 
         return {
             agent: this.name,
-            acknowledgment,
-            query,
-            context,
-            response,
+            response: `${acknowledgment} ${response}`,
             timestamp: new Date().toISOString(),
         };
     }

@@ -1,13 +1,38 @@
-import Link from "next/link";
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card";
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import Link from "next/link";
 
 export default function Home() {
+  const router = useRouter();
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [meetingId, setMeetingId] = useState("");
+  const [agentConfigs, setAgentConfigs] = useState({
+    agent1: { name: "Dr. Thesis", enabled: true },
+    agent2: { name: "Dev", enabled: true },
+    agent3: { name: "Sage", enabled: true },
+  });
+
+  const handleStartDialogue = () => {
+    // For now, just navigate to tutor page with dummy config
+    // Config values are stored in state but not used yet
+    console.log("Starting dialogue with config:", { meetingId, agentConfigs });
+    setDialogOpen(false);
+    router.push("/tutor");
+  };
+
   return (
     <main className="flex min-h-screen flex-col items-center justify-center gap-10 p-8 font-[family-name:var(--font-geist-sans)]">
       <div className="text-center space-y-3">
@@ -17,59 +42,72 @@ export default function Home() {
         </p>
       </div>
 
-      <div className="grid gap-6 sm:grid-cols-2 max-w-3xl w-full">
-        <Link href="/tutor" className="block">
-          <Card className="h-full hover:shadow-lg transition-shadow cursor-pointer border-2 hover:border-primary/40">
-            <CardHeader>
-              <CardTitle className="text-lg">HeyGen Avatar</CardTitle>
-              <CardDescription>
-                Type text and have the HeyGen streaming avatar speak it back to
-                you in real-time.
-              </CardDescription>
-            </CardHeader>
-          </Card>
-        </Link>
+      <div className="flex flex-col gap-6 w-full max-w-md">
+        <Button
+          onClick={() => setDialogOpen(true)}
+          size="lg"
+          className="w-full"
+        >
+          New Dialogue
+        </Button>
 
-        <Link href="/test" className="block">
-          <Card className="h-full hover:shadow-lg transition-shadow cursor-pointer border-2 hover:border-primary/40">
-            <CardHeader>
-              <CardTitle className="text-lg">API Testing</CardTitle>
-              <CardDescription>
-                Test Elasticsearch connection, document ingestion, hybrid search,
-                and course listing APIs.
-              </CardDescription>
-            </CardHeader>
-          </Card>
-        </Link>
-
-        <Link href="/dashboard" className="block">
-          <Card className="h-full hover:shadow-lg transition-shadow cursor-pointer border-2 hover:border-primary/40">
-            <CardHeader>
-              <CardTitle className="text-lg">Debate Analysis</CardTitle>
-              <CardDescription>
-                Analyze meeting transcripts and get detailed feedback on student
-                debate performance with rubric-based scoring.
-              </CardDescription>
-            </CardHeader>
-          </Card>
-        </Link>
-
-        <Link href="/analyses" className="block">
-          <Card className="h-full hover:shadow-lg transition-shadow cursor-pointer border-2 hover:border-primary/40">
-            <CardHeader>
-              <CardTitle className="text-lg">Stored Analyses</CardTitle>
-              <CardDescription>
-                View and manage automatically generated analysis results from past
-                meetings. Analyses are created when meetings end.
-              </CardDescription>
-            </CardHeader>
-          </Card>
-        </Link>
+        <Button asChild size="lg" variant="outline" className="w-full">
+          <Link href="/analyses">View Analytics</Link>
+        </Button>
       </div>
 
-      <Button asChild size="lg">
-        <Link href="/tutor">Start Avatar</Link>
-      </Button>
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>New Dialogue Configuration</DialogTitle>
+            <DialogDescription>
+              Configure your meeting settings and agent preferences.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <Label htmlFor="meeting-id">Meeting ID</Label>
+              <Input
+                id="meeting-id"
+                placeholder="Enter meeting ID (optional)"
+                value={meetingId}
+                onChange={(e) => setMeetingId(e.target.value)}
+              />
+            </div>
+            <div className="grid gap-3">
+              <Label>Agent Configuration</Label>
+              <div className="space-y-3">
+                {Object.entries(agentConfigs).map(([key, config]) => (
+                  <div key={key} className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        checked={config.enabled}
+                        onChange={(e) =>
+                          setAgentConfigs({
+                            ...agentConfigs,
+                            [key]: { ...config, enabled: e.target.checked },
+                          })
+                        }
+                        className="rounded"
+                      />
+                      <Label htmlFor={key} className="font-normal">
+                        {config.name} ({key})
+                      </Label>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleStartDialogue}>Start Dialogue</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </main>
   );
 }

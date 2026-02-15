@@ -20,7 +20,7 @@ export default function TutorPage() {
   const agent2Ref = useRef<AvatarPanelHandle>(null);
   const agent3Ref = useRef<AvatarPanelHandle>(null);
   const [log, setLog] = useState<SttMessage[]>([]);
-  const [polling, setPolling] = useState(false);
+  const [polling, setPolling] = useState(true); // Automatically enabled
   const logEndRef = useRef<HTMLDivElement>(null);
 
   const agentRefs: Record<string, React.RefObject<AvatarPanelHandle | null>> = {
@@ -86,21 +86,9 @@ export default function TutorPage() {
           Dialectic
         </Link>
         <div className="flex items-center gap-4">
-          <label className="flex items-center gap-2 text-sm">
-            <input
-              type="checkbox"
-              checked={polling}
-              onChange={(e) => setPolling(e.target.checked)}
-              className="rounded"
-            />
-            Poll Zoom STT
-          </label>
-          <Link
-            href="/test"
-            className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-          >
-            API Testing
-          </Link>
+          <span className="text-sm text-muted-foreground">
+            Poll Zoom STT: Enabled
+          </span>
         </div>
       </header>
 
