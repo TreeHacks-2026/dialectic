@@ -15,3 +15,11 @@ services:
         sync: false
       - key: HEYGEN_API_KEY
         sync: false
+      # RTMS Credentials
+      - key: ZM_RTMS_CLIENT
+        sync: false
+      - key: ZM_RTMS_SECRET
+        sync: false
+      # Optional: Webhook secret for validation
+      - key: ZOOM_WEBHOOK_SECRET
+        sync: false
