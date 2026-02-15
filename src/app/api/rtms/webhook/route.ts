@@ -38,17 +38,19 @@ function getRTMSClient(): RTMSClient {
 
   // Listen for transcript events and process through full pipeline
   rtmsClient.on('transcript', async (event) => {
-    if (event.is_final) {
-      console.log(`[RTMS API] 📝 Transcript: ${event.speaker_name}: ${event.text}`);
-      
-      // Store transcript in queue
-      transcriptQueue.push({
-        speaker_name: event.speaker_name,
-        text: event.text,
-        timestamp: event.ts_ms,
-        is_final: event.is_final,
-      });
+    // Log ALL transcripts (both final and interim)
+    console.log(`[RTMS API] 📝 Transcript (${event.is_final ? 'FINAL' : 'INTERIM'}): ${event.speaker_name}: ${event.text}`);
+    
+    // Store transcript in queue for frontend display (both final and interim)
+    transcriptQueue.push({
+      speaker_name: event.speaker_name,
+      text: event.text,
+      timestamp: event.ts_ms,
+      is_final: event.is_final,
+    });
 
+    // Only process final transcripts through the LLM pipeline
+    if (event.is_final) {
       // Add to meeting transcript manager
       // Get session ID with proper fallback chain
       const sessionId = rtmsClient?.getCurrentSessionId() 
@@ -144,6 +146,9 @@ function getRTMSClient(): RTMSClient {
       } catch (error) {
         console.error('[RTMS API] ❌ Error in LLM pipeline:', error);
       }
+    } else {
+      // For interim transcripts, just log and store (don't send to LLM yet)
+      console.log(`[RTMS API] 📊 Stored interim transcript (will process when final)`);
     }
   });
 

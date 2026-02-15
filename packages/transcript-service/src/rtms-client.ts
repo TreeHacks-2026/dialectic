@@ -140,7 +140,7 @@ export class RTMSClientWrapper extends EventEmitter {
           
           if (isFinal) {
             // If Zoom says it's final, process immediately
-            // Clear any pending timeout
+            // Clear any pending timeout for this speaker
             const existing = this.transcriptBuffer.get(bufferKey);
             if (existing) {
               clearTimeout(existing.timeout);
@@ -156,27 +156,41 @@ export class RTMSClientWrapper extends EventEmitter {
               is_final: true,
             };
             
+            console.log(`[RTMS] ✅ Final transcript: ${speakerName}: ${transcriptText.substring(0, 50)}...`);
             this.emit('transcript', transcriptEvent);
           } else {
-            // For interim transcripts, buffer and process after 3 seconds of silence
+            // For interim transcripts, process immediately but mark as interim
+            // Clear any pending timeout
             const existing = this.transcriptBuffer.get(bufferKey);
-            
             if (existing) {
-              // Clear existing timeout
               clearTimeout(existing.timeout);
             }
             
-            // Update buffer with latest text
+            // Process interim transcript immediately
+            const transcriptEvent: TranscriptEvent = {
+              session_id: rtmsStreamId,
+              speaker_id: speakerId,
+              speaker_name: speakerName,
+              text: transcriptText,
+              ts_ms: timestamp,
+              is_final: false,
+            };
+            
+            console.log(`[RTMS] 📝 Interim transcript: ${speakerName}: ${transcriptText.substring(0, 50)}...`);
+            this.emit('transcript', transcriptEvent);
+            
+            // Also buffer it with a short timeout (1 second) in case we need to process as final
+            // if no final transcript arrives
             this.transcriptBuffer.set(bufferKey, {
               text: transcriptText,
               speaker: speakerName,
               speakerId: speakerId,
               timestamp: timestamp,
               timeout: setTimeout(() => {
-                // After 3 seconds of no updates, process as final
+                // After 1 second of no updates, process as final (fallback)
                 const buffered = this.transcriptBuffer.get(bufferKey);
                 if (buffered) {
-                  const transcriptEvent: TranscriptEvent = {
+                  const finalEvent: TranscriptEvent = {
                     session_id: rtmsStreamId,
                     speaker_id: buffered.speakerId,
                     speaker_name: buffered.speaker,
@@ -185,11 +199,11 @@ export class RTMSClientWrapper extends EventEmitter {
                     is_final: true,
                   };
                   
-                  console.log(`[RTMS] ⏱️ Processing buffered transcript after 3s timeout: ${buffered.speaker}: ${buffered.text.substring(0, 50)}...`);
-                  this.emit('transcript', transcriptEvent);
+                  console.log(`[RTMS] ⏱️ Processing buffered transcript as final after 1s: ${buffered.speaker}: ${buffered.text.substring(0, 50)}...`);
+                  this.emit('transcript', finalEvent);
                   this.transcriptBuffer.delete(bufferKey);
                 }
-              }, 3000) // 3 second timeout
+              }, 1000) // 1 second timeout (reduced from 3s)
             });
           }
         }
