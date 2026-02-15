@@ -4,13 +4,13 @@
 
 import { MeetingConfig, AgentResponse } from "../types/types";
 import { PerplexityClient } from "./perplexity-client";
-import { GeminiClient } from "./gemini-client";
+import { ClaudeClient } from "./claude-client";
 import { AgentSelector } from "./agent-selector";
 import { Agent } from "./agent";
 import { Transcript } from "./transcript";
 
 export interface ApiKeys {
-    gemini: string;      // Free — used for agent selection
+    claude: string;      // Used for agent selection
     perplexity: string;  // Paid — used for agent responses
 }
 
@@ -24,11 +24,11 @@ export class MultiAgentSystem {
         this.config = config;
         this.transcript = new Transcript();
 
-        // Gemini Flash for agent selection (free)
-        const geminiClient = new GeminiClient(keys.gemini);
+        // Claude for agent selection
+        const claudeClient = new ClaudeClient(keys.claude);
         this.selector = new AgentSelector(
-            geminiClient,
-            config.gemini.selectionModel,
+            claudeClient,
+            config.claude.selectionModel,
             config.agents
         );
 

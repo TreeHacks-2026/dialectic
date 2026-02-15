@@ -29,22 +29,22 @@ function getMultiAgentSystem(): MultiAgentSystem {
   }
 
   // Get API keys from environment
-  const geminiKey = process.env.GEMINI_API_KEY || '';
+  const claudeKey = process.env.CLAUDE_API_KEY || '';
   const perplexityKey = process.env.PERPLEXITY_API_KEY || '';
 
-  if (!geminiKey || !perplexityKey) {
-    throw new Error('GEMINI_API_KEY and PERPLEXITY_API_KEY must be set');
+  if (!claudeKey || !perplexityKey) {
+    throw new Error('CLAUDE_API_KEY and PERPLEXITY_API_KEY must be set');
   }
 
   const keys: ApiKeys = {
-    gemini: geminiKey,
+    claude: claudeKey,
     perplexity: perplexityKey,
   };
 
   const meetingConfig = configData as MeetingConfig;
   multiAgentSystem = new MultiAgentSystem(meetingConfig, keys);
 
-  console.log('[LLM] ✅ Multi-agent system initialized');
+  console.log('[LLM] ✅ Multi-agent system initialized with Claude');
   console.log(`[LLM] Agents: ${meetingConfig.agents.map(a => a.name).join(', ')}`);
 
   return multiAgentSystem;

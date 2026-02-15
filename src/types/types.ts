@@ -15,7 +15,7 @@ export interface PerplexityConfig {
     responseModel: string;
 }
 
-export interface GeminiConfig {
+export interface ClaudeConfig {
     selectionModel: string;
 }
 
@@ -23,7 +23,7 @@ export interface MeetingConfig {
     agents: AgentConfig[];
     humans: HumanConfig[];
     perplexity: PerplexityConfig;
-    gemini: GeminiConfig;
+    claude: ClaudeConfig;
 }
 
 export interface TranscriptEntry {
