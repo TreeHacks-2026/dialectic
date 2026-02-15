@@ -41,7 +41,7 @@ export default function ChatPanel({ messages, isLoading }: ChatPanelProps) {
         >
           {messages.length === 0 && !isLoading && (
             <p className="text-sm text-muted-foreground text-center pt-8">
-              Ask a question about your course materials to get started.
+              Type a message and the avatar will speak it.
             </p>
           )}
 

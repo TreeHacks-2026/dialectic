@@ -25,7 +25,6 @@ const AvatarPanel = forwardRef<AvatarPanelHandle, AvatarPanelProps>(
   function AvatarPanel({ onReady }, ref) {
     const [status, setStatus] = useState<AvatarStatus>("idle");
     const [errorMessage, setErrorMessage] = useState("");
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const avatarRef = useRef<any>(null);
     const videoRef = useRef<HTMLVideoElement>(null);
 
