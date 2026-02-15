@@ -71,7 +71,10 @@ export class RTMSClientWrapper extends EventEmitter {
       .update(message)
       .digest('hex');
 
-    console.log(`[RTMS] Generated signature: ${signature}`);
+    // Signature generation logged only in debug mode
+    if (process.env.RTMS_DEBUG === 'true') {
+      console.log(`[RTMS] Generated signature: ${signature}`);
+    }
     return signature;
   }
 
@@ -98,7 +101,9 @@ export class RTMSClientWrapper extends EventEmitter {
         signature: this.generateSignature(meetingUuid, rtmsStreamId),
         media_type: 8 // TRANSCRIPT only
       };
-      console.log('[RTMS] Sending transcript handshake:', JSON.stringify(handshakeMsg, null, 2));
+      if (process.env.RTMS_DEBUG === 'true') {
+        console.log('[RTMS] Sending transcript handshake:', JSON.stringify(handshakeMsg, null, 2));
+      }
       mediaWs.send(JSON.stringify(handshakeMsg));
     });
 
@@ -139,7 +144,7 @@ export class RTMSClientWrapper extends EventEmitter {
         
         // Handle keep-alive
         else if (msg.msg_type === 12) { // KEEP_ALIVE_REQ
-          console.log('[RTMS] Received KEEP_ALIVE_REQ, responding with KEEP_ALIVE_ACK');
+              // Handle keep-alive silently
           mediaWs.send(JSON.stringify({
             msg_type: 13, // KEEP_ALIVE_ACK
             timestamp: msg.timestamp
@@ -156,7 +161,9 @@ export class RTMSClientWrapper extends EventEmitter {
     });
 
     mediaWs.on('close', (code, reason) => {
-      console.log(`[RTMS] Media WebSocket closed: ${code} ${reason}`);
+      if (code !== 1000) {
+        console.log(`[RTMS] Media WebSocket closed: ${code} ${reason}`);
+      }
       this.mediaWs = null;
     });
 
@@ -191,7 +198,9 @@ export class RTMSClientWrapper extends EventEmitter {
         signature
       };
 
-      console.log('[RTMS] Sending handshake message:', JSON.stringify(handshakeMsg, null, 2));
+      if (process.env.RTMS_DEBUG === 'true') {
+        console.log('[RTMS] Sending handshake message:', JSON.stringify(handshakeMsg, null, 2));
+      }
       signalingWs.send(JSON.stringify(handshakeMsg));
     });
 
@@ -212,7 +221,7 @@ export class RTMSClientWrapper extends EventEmitter {
         
         // Handle keep-alive requests
         else if (msg.msg_type === 12) { // KEEP_ALIVE_REQ
-          console.log('[RTMS] Received KEEP_ALIVE_REQ, responding with KEEP_ALIVE_RESP');
+          // Handle keep-alive silently
           signalingWs.send(JSON.stringify({
             msg_type: 13, // KEEP_ALIVE_RESP
             timestamp: msg.timestamp
@@ -229,7 +238,9 @@ export class RTMSClientWrapper extends EventEmitter {
     });
 
     signalingWs.on('close', (code, reason) => {
-      console.log(`[RTMS] Signaling WebSocket closed: ${code} ${reason}`);
+      if (code !== 1000) {
+        console.log(`[RTMS] Signaling WebSocket closed: ${code} ${reason}`);
+      }
       this.signalingWs = null;
     });
 

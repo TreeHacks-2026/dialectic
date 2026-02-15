@@ -17,8 +17,8 @@ import { ZoomAPIClient } from './zoom-api.js';
 import applyHeaders from './utils/applyHeaders.js';
 
 // Export types for team
-export type { TranscriptEvent } from '../../shared/events.js';
 import type { TranscriptEvent } from '../../shared/events.js';
+export type { TranscriptEvent };
 
 // Create RTMS client (singleton)
 const rtmsClient = new RTMSClient();
@@ -128,12 +128,16 @@ app.post('/webhook', (req, res) => {
   console.log('[Webhook] 📥 POST to /webhook');
   const webhookData = req.body;
   
-  // DEBUG: Log all incoming events to help diagnose RTMS connection issues
-  console.log('[Webhook] 🔍 Event received:', webhookData.event);
-  if (webhookData.event === 'meeting.rtms_started') {
-    console.log('[Webhook] ✅ RTMS STARTED EVENT RECEIVED!');
-    console.log('[Webhook] 📦 Payload keys:', Object.keys(webhookData.payload || {}));
-    console.log('[Webhook] 📦 Full payload:', JSON.stringify(webhookData.payload, null, 2));
+  // Log RTMS events for debugging
+  if (webhookData.event === 'meeting.rtms_started' || webhookData.event === 'meeting.rtms_stopped') {
+    console.log('[Webhook] 🔍 Event received:', webhookData.event);
+    if (webhookData.event === 'meeting.rtms_started') {
+      console.log('[Webhook] ✅ RTMS STARTED EVENT RECEIVED!');
+      if (process.env.WEBHOOK_DEBUG === 'true') {
+        console.log('[Webhook] 📦 Payload keys:', Object.keys(webhookData.payload || {}));
+        console.log('[Webhook] 📦 Full payload:', JSON.stringify(webhookData.payload, null, 2));
+      }
+    }
   }
   
   // Pass ALL events to RTMS handler (it will filter internally, matching reference implementation)
@@ -148,7 +152,7 @@ app.post('/webhook', (req, res) => {
   return processWebhookRequest(req, res, rtmsClient, zoomAPI);
 });
 
-// Legacy webhook handler (kept for backward compatibility)
+// Legacy webhook handler for /zoom/webhook endpoint (kept for backward compatibility)
 app.use(createWebhookHandler(rtmsClient, zoomAPI));
 
 // Handle POST requests to root (Zoom sometimes sends webhooks here)

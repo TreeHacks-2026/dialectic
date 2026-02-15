@@ -11,28 +11,28 @@ function processWebhookRequest(req: express.Request, res: express.Response, rtms
     const event = req.body.event || 'unknown event';
     const payload = req.body.payload || {};
     
-    // DEBUG MODE: Set to false to reduce noise
-    const DEBUG_MODE = true;
+    // DEBUG MODE: Configurable via environment variable
+    const DEBUG_MODE = process.env.WEBHOOK_DEBUG === 'true';
     
-    // ============================================
-    // COMPREHENSIVE LOGGING - Capture EVERYTHING from Zoom
-    // ============================================
-    console.log('\n' + '='.repeat(80));
-    console.log('[Webhook] 📥 RAW WEBHOOK DATA FROM ZOOM');
-    console.log('='.repeat(80));
-    console.log('[Webhook] Event Name:', event);
-    console.log('[Webhook] Event Timestamp:', req.body.event_ts || 'N/A');
-    console.log('[Webhook] Full Request Body:', JSON.stringify(req.body, null, 2));
-    console.log('[Webhook] Request Headers:', JSON.stringify(req.headers, null, 2));
-    console.log('[Webhook] Payload Keys:', Object.keys(payload).join(', '));
-    if (payload.object) {
-      console.log('[Webhook] Payload Object Keys:', Object.keys(payload.object).join(', '));
-      console.log('[Webhook] Payload Object:', JSON.stringify(payload.object, null, 2));
+    // Comprehensive logging (only in debug mode)
+    if (DEBUG_MODE) {
+      console.log('\n' + '='.repeat(80));
+      console.log('[Webhook] 📥 RAW WEBHOOK DATA FROM ZOOM');
+      console.log('='.repeat(80));
+      console.log('[Webhook] Event Name:', event);
+      console.log('[Webhook] Event Timestamp:', req.body.event_ts || 'N/A');
+      console.log('[Webhook] Full Request Body:', JSON.stringify(req.body, null, 2));
+      console.log('[Webhook] Request Headers:', JSON.stringify(req.headers, null, 2));
+      console.log('[Webhook] Payload Keys:', Object.keys(payload).join(', '));
+      if (payload.object) {
+        console.log('[Webhook] Payload Object Keys:', Object.keys(payload.object).join(', '));
+        console.log('[Webhook] Payload Object:', JSON.stringify(payload.object, null, 2));
+      }
+      if (Object.keys(payload).length > 0 && !payload.object) {
+        console.log('[Webhook] Full Payload:', JSON.stringify(payload, null, 2));
+      }
+      console.log('='.repeat(80) + '\n');
     }
-    if (Object.keys(payload).length > 0 && !payload.object) {
-      console.log('[Webhook] Full Payload:', JSON.stringify(payload, null, 2));
-    }
-    console.log('='.repeat(80) + '\n');
     
     // Get secret when handler is called (after dotenv has loaded)
     const ZOOM_WEBHOOK_SECRET = process.env.ZOOM_WEBHOOK_SECRET;
@@ -133,14 +133,9 @@ function processWebhookRequest(req: express.Request, res: express.Response, rtms
       return res.status(200).json({ status: 'ok', event });
     }
     
-    // 5. Handle RTMS events - matching zoom-demeanor-evaluator-node approach
-    // Handle meeting.rtms_started and meeting.rtms_stopped events
+    // 5. Handle RTMS events (handled by RTMS client in main webhook handler)
+    // These are processed in index.ts before this function is called
     if (event === 'meeting.rtms_started' || event === 'meeting.rtms_stopped') {
-      // Pass webhook data directly to RTMS client handler (matching reference implementation)
-      rtmsClient.handleWebhookEvent({
-        event: event,
-        payload: payload,
-      });
       return res.status(200).json({ status: 'ok', event });
     }
     
@@ -165,7 +160,7 @@ function processWebhookRequest(req: express.Request, res: express.Response, rtms
       return res.status(200).json({ status: 'ok', event });
     }
     
-    // 7. Handle meeting end events (with stale event filtering)
+    // 7. Handle meeting end events
     if (event === 'meeting.ended' || event === 'session.ended') {
       const meeting = payload.meeting || payload.object;
       const meetingId = meeting?.id || meeting?.meeting_id || meeting?.meeting_number || 'unknown';
@@ -204,7 +199,7 @@ function processWebhookRequest(req: express.Request, res: express.Response, rtms
       return res.status(200).json({ status: 'ok', event });
     }
     
-    // 7. Handle poll events
+    // 8. Handle poll events
     if (event === 'meeting.poll_created' || event === 'meeting.poll_started') {
       const poll = payload.object || payload;
       const pollTitle = poll.title || poll.question || 'Untitled Poll';
@@ -219,7 +214,7 @@ function processWebhookRequest(req: express.Request, res: express.Response, rtms
       return res.status(200).json({ status: 'ok', event });
     }
     
-    // 8. Handle recording events
+    // 9. Handle recording events
     if (event === 'recording.started') {
       const recording = payload.object || payload;
       const meetingId = recording.meeting_id || recording.id || 'unknown';
@@ -234,7 +229,7 @@ function processWebhookRequest(req: express.Request, res: express.Response, rtms
       return res.status(200).json({ status: 'ok', event });
     }
     
-    // 9. Handle other events (with debug logging)
+    // 10. Handle other events
     const ignoredEvents = ['user.presence_status_updated'];
     if (!ignoredEvents.includes(event)) {
       console.log(`[Webhook] ℹ️  Unhandled event: ${event}`);
