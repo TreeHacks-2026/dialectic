@@ -18,6 +18,7 @@ import Link from "next/link";
 import { DEFAULT_AGENT_TEMPLATES, type DefaultAgentTemplate } from "@/lib/default-agents";
 import { saveDialogueConfig } from "@/lib/dialogue-config";
 import { X, Plus } from "lucide-react";
+import OrnateD from "@/components/ornate-d";
 
 interface AgentConfig {
   id: string;
@@ -149,9 +150,12 @@ export default function Home() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-center gap-10 p-8 font-[family-name:var(--font-geist-sans)]">
       <div className="text-center space-y-3">
-        <h1 className="text-6xl font-bold tracking-tight">Dialectic</h1>
+        <h1 className="text-6xl font-bold tracking-tight flex items-center justify-center gap-2">
+          <OrnateD className="h-16 w-16" />
+          <span>ialectic</span>
+        </h1>
         <p className="text-xl text-muted-foreground max-w-lg">
-          AI Teaching Assistant with Avatar Office Hours
+          The world's thinkers, one conversation away.
         </p>
       </div>
 

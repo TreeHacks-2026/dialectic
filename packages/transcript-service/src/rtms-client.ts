@@ -37,6 +37,15 @@ export class RTMSClientWrapper extends EventEmitter {
     streamId?: string;
     message: string;
   }) => void) | null = null;
+  
+  // Transcript buffer for 3-second timeout processing
+  private transcriptBuffer: Map<string, {
+    text: string;
+    speaker: string;
+    speakerId: string;
+    timestamp: number;
+    timeout: NodeJS.Timeout;
+  }> = new Map();
 
   /**
    * Initialize RTMS client with credentials
@@ -121,18 +130,68 @@ export class RTMSClientWrapper extends EventEmitter {
           const transcriptText = msg.content?.data || '';
           const speakerName = msg.content?.user_name || 'Unknown';
           const timestamp = msg.timestamp || Date.now();
-
-          // Emit transcript event (no terminal output - just send to server)
-          const transcriptEvent: TranscriptEvent = {
-            session_id: rtmsStreamId,
-            speaker_id: msg.content?.user_id || 'unknown',
-            speaker_name: speakerName,
-            text: transcriptText,
-            ts_ms: timestamp,
-            is_final: true,
-          };
-
-          this.emit('transcript', transcriptEvent);
+          const speakerId = msg.content?.user_id || 'unknown';
+          
+          // Use Zoom's is_final if available, otherwise default to false for interim
+          const isFinal = msg.content?.is_final ?? false;
+          
+          // Create a unique key for this speaker's current utterance
+          const bufferKey = `${rtmsStreamId}-${speakerId}`;
+          
+          if (isFinal) {
+            // If Zoom says it's final, process immediately
+            // Clear any pending timeout
+            const existing = this.transcriptBuffer.get(bufferKey);
+            if (existing) {
+              clearTimeout(existing.timeout);
+              this.transcriptBuffer.delete(bufferKey);
+            }
+            
+            const transcriptEvent: TranscriptEvent = {
+              session_id: rtmsStreamId,
+              speaker_id: speakerId,
+              speaker_name: speakerName,
+              text: transcriptText,
+              ts_ms: timestamp,
+              is_final: true,
+            };
+            
+            this.emit('transcript', transcriptEvent);
+          } else {
+            // For interim transcripts, buffer and process after 3 seconds of silence
+            const existing = this.transcriptBuffer.get(bufferKey);
+            
+            if (existing) {
+              // Clear existing timeout
+              clearTimeout(existing.timeout);
+            }
+            
+            // Update buffer with latest text
+            this.transcriptBuffer.set(bufferKey, {
+              text: transcriptText,
+              speaker: speakerName,
+              speakerId: speakerId,
+              timestamp: timestamp,
+              timeout: setTimeout(() => {
+                // After 3 seconds of no updates, process as final
+                const buffered = this.transcriptBuffer.get(bufferKey);
+                if (buffered) {
+                  const transcriptEvent: TranscriptEvent = {
+                    session_id: rtmsStreamId,
+                    speaker_id: buffered.speakerId,
+                    speaker_name: buffered.speaker,
+                    text: buffered.text,
+                    ts_ms: buffered.timestamp,
+                    is_final: true,
+                  };
+                  
+                  console.log(`[RTMS] ⏱️ Processing buffered transcript after 3s timeout: ${buffered.speaker}: ${buffered.text.substring(0, 50)}...`);
+                  this.emit('transcript', transcriptEvent);
+                  this.transcriptBuffer.delete(bufferKey);
+                }
+              }, 3000) // 3 second timeout
+            });
+          }
         }
         
         // Handle keep-alive
@@ -332,6 +391,14 @@ export class RTMSClientWrapper extends EventEmitter {
    * Disconnect from RTMS session
    */
   disconnect(streamId: string): void {
+    // Clear any pending transcript timeouts for this stream
+    for (const [key, buffered] of this.transcriptBuffer.entries()) {
+      if (key.startsWith(`${streamId}-`)) {
+        clearTimeout(buffered.timeout);
+        this.transcriptBuffer.delete(key);
+      }
+    }
+    
     if (this.mediaWs) {
       this.mediaWs.close();
       this.mediaWs = null;

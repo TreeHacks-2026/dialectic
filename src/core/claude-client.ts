@@ -47,7 +47,7 @@ export class ClaudeClient {
                     },
                 ],
                 max_tokens: 1024,
-                temperature: 0.1, // Low temp for deterministic routing
+                temperature: 0.0, // Zero temperature for maximum determinism and accuracy
             }),
         });
 
