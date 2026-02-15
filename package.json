@@ -7,7 +7,8 @@
   ],
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "npm run build:transcript && next build",
+    "build:transcript": "npm run build --workspace=@dialectic/transcript-service",
     "start": "next start",
     "lint": "eslint .",
     "dev:transcript": "npm run dev --workspace=@dialectic/transcript-service",
