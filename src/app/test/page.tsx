@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -229,11 +229,33 @@ function CoursesTab() {
 }
 
 function ZoomSttTab() {
-  const [agent, setAgent] = useState<"agent1" | "agent2" | "agent3">("agent1");
+  const [agent, setAgent] = useState<string>("");
+  const [availableAgents, setAvailableAgents] = useState<Array<{ id: string; label: string }>>([]);
+  const [loadingAgents, setLoadingAgents] = useState(false);
   const [speaker, setSpeaker] = useState("John");
   const [text, setText] = useState("Hello, this is a test of the Zoom speech-to-text endpoint.");
   const [result, setResult] = useState<ApiResult | null>(null);
   const [loading, setLoading] = useState(false);
+
+  const fetchAgents = async () => {
+    setLoadingAgents(true);
+    try {
+      const res = await fetch("/api/agents");
+      if (res.ok) {
+        const data = await res.json();
+        const agents = data.agents ?? [];
+        setAvailableAgents(agents);
+        if (!agent && agents.length > 0) {
+          setAgent(agents[0].id);
+        }
+      }
+    } catch (err) {
+      console.error("Failed to fetch agents:", err);
+    }
+    setLoadingAgents(false);
+  };
+
+  useEffect(() => { fetchAgents(); }, []);
 
   const testZoomStt = async () => {
     setLoading(true);
@@ -255,19 +277,24 @@ function ZoomSttTab() {
       <div className="space-y-3">
         <div>
           <Label>Agent</Label>
-          <div className="flex gap-4 mt-1">
-            {(["agent1", "agent2", "agent3"] as const).map((a) => (
-              <label key={a} className="flex items-center gap-1.5 text-sm cursor-pointer">
-                <input
-                  type="radio"
-                  name="zoom-agent"
-                  value={a}
-                  checked={agent === a}
-                  onChange={() => setAgent(a)}
-                />
-                {a}
-              </label>
-            ))}
+          <div className="flex gap-2 mt-1">
+            <select
+              value={agent}
+              onChange={(e) => setAgent(e.target.value)}
+              className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+            >
+              <option value="" disabled>
+                {availableAgents.length === 0 ? "No agents active — add agents on /tutor" : "Select an agent"}
+              </option>
+              {availableAgents.map((a) => (
+                <option key={a.id} value={a.id}>
+                  {a.label} ({a.id})
+                </option>
+              ))}
+            </select>
+            <Button variant="outline" size="sm" onClick={fetchAgents} disabled={loadingAgents}>
+              {loadingAgents ? "..." : "Refresh"}
+            </Button>
           </div>
         </div>
         <div>
@@ -290,7 +317,7 @@ function ZoomSttTab() {
           />
         </div>
       </div>
-      <Button onClick={testZoomStt} disabled={loading || !speaker || !text}>
+      <Button onClick={testZoomStt} disabled={loading || !agent || !speaker || !text}>
         {loading ? "Sending..." : "Test Zoom STT"}
       </Button>
       <ResultDisplay result={result} />

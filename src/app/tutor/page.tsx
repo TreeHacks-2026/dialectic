@@ -79,6 +79,22 @@ export default function TutorPage() {
     return () => clearInterval(interval);
   }, [polling]);
 
+  // Register / unregister agents with the API
+  const registeredIds = useRef<Set<string>>(new Set());
+
+  useEffect(() => {
+    for (const agent of agents) {
+      if (!registeredIds.current.has(agent.id)) {
+        registeredIds.current.add(agent.id);
+        fetch("/api/agents", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id: agent.id, label: agent.label }),
+        }).catch((err) => console.error("Failed to register agent:", err));
+      }
+    }
+  }, [agents]);
+
   const addAgent = useCallback(() => {
     setAgents((prev) => {
       if (prev.length >= MAX_AGENTS) return prev;
@@ -96,12 +112,19 @@ export default function TutorPage() {
 
   const removeAgent = useCallback((id: string) => {
     agentRefsMap.current.delete(id);
+    registeredIds.current.delete(id);
     setPoppedAgents((prev) => {
       const next = { ...prev };
       delete next[id];
       return next;
     });
     setAgents((prev) => prev.filter((a) => a.id !== id));
+
+    fetch("/api/agents", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id }),
+    }).catch((err) => console.error("Failed to unregister agent:", err));
   }, []);
 
   const togglePopout = useCallback((id: string) => {
@@ -195,6 +218,7 @@ export default function TutorPage() {
                 isPopped={!!poppedAgents[agent.id]}
                 onTogglePopout={() => togglePopout(agent.id)}
                 onRestore={() => restoreAgent(agent.id)}
+                colorAccent={BADGE_PALETTE[agent.colorIndex % BADGE_PALETTE.length].accent}
               >
                 <AvatarPanel
                   ref={(handle) => {

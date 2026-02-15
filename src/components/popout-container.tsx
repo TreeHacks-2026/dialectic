@@ -1,9 +1,7 @@
 "use client";
 
-import { type ReactNode, useEffect, useRef } from "react";
-import { createPortal } from "react-dom";
+import { type ReactNode } from "react";
 import { AnimatePresence } from "framer-motion";
-import { useDocumentPiP } from "@/hooks/use-document-pip";
 import FloatingPanel from "@/components/floating-panel";
 import PopoutPlaceholder from "@/components/popout-placeholder";
 
@@ -13,6 +11,7 @@ interface PopoutContainerProps {
   isPopped: boolean;
   onTogglePopout: () => void;
   onRestore: () => void;
+  colorAccent?: string;
 }
 
 export default function PopoutContainer({
@@ -21,83 +20,17 @@ export default function PopoutContainer({
   isPopped,
   onTogglePopout,
   onRestore,
+  colorAccent,
 }: PopoutContainerProps) {
-  const pip = useDocumentPiP();
-  const hasOpened = useRef(false);
-
-  // Open PiP window when isPopped becomes true
-  useEffect(() => {
-    if (!isPopped) {
-      hasOpened.current = false;
-      if (pip.isOpen) {
-        pip.close();
-      }
-      return;
-    }
-
-    if (hasOpened.current) return;
-
-    if (pip.isSupported) {
-      hasOpened.current = true;
-      pip.open(480, 360).then((win) => {
-        if (!win) {
-          // PiP failed to open — restore immediately
-          onRestore();
-        }
-      });
-    }
-  }, [isPopped, pip.isSupported]);
-
-  // Style the PiP window body when it becomes available
-  useEffect(() => {
-    if (pip.pipWindow) {
-      const body = pip.pipWindow.document.body;
-      body.style.margin = '0';
-      body.style.padding = '8px';
-      body.style.background = 'linear-gradient(135deg, #f8fafc, #f0f4ff)';
-      body.style.fontFamily = 'var(--font-geist-sans), system-ui, sans-serif';
-      body.style.overflow = 'hidden';
-    }
-  }, [pip.pipWindow]);
-
-  // Handle PiP window closed by user (pagehide fires, isOpen becomes false)
-  useEffect(() => {
-    if (isPopped && hasOpened.current && !pip.isOpen && pip.isSupported) {
-      onRestore();
-    }
-  }, [pip.isOpen, isPopped, pip.isSupported, onRestore]);
-
-  // Not popped — render children normally
   if (!isPopped) {
     return <>{children}</>;
   }
 
-  // Popped + PiP supported + window open — portal into PiP window
-  if (pip.isSupported && pip.pipWindow) {
-    return (
-      <>
-        <PopoutPlaceholder label={label} onRestore={onRestore} />
-        {createPortal(
-          <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-            {children}
-          </div>,
-          pip.pipWindow.document.body
-        )}
-      </>
-    );
-  }
-
-  // Popped + PiP supported but window not yet open — show placeholder while opening
-  if (pip.isSupported && !pip.pipWindow) {
-    return <PopoutPlaceholder label={label} onRestore={onRestore} />;
-  }
-
-  // Popped + PiP not supported — use floating panel fallback
   return (
     <>
       <PopoutPlaceholder label={label} onRestore={onRestore} />
       <AnimatePresence>
-        <FloatingPanel label={label} onClose={onRestore}>
+        <FloatingPanel label={label} onClose={onRestore} colorAccent={colorAccent}>
           {children}
         </FloatingPanel>
       </AnimatePresence>
