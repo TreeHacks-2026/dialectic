@@ -249,16 +249,19 @@ export async function POST(request: NextRequest) {
       if (!sessionConfig) {
         // Try to migrate a pending config (temp session) to this RTMS session
         const meetingUuid = payload.meeting_uuid as string | undefined;
+        console.log(`[RTMS API] 🔍 Attempting to migrate pending config for session ${sessionId}, meeting: ${meetingUuid || 'none'}`);
         sessionConfig = migratePendingConfigToSession(sessionId, meetingUuid);
         
         if (sessionConfig) {
           console.log(`[RTMS API] ✅ Migrated pending config to session ${sessionId} with ${sessionConfig.agents.length} agents`);
+          console.log(`[RTMS API] 📋 Agents: ${sessionConfig.agents.map(a => a.name).join(', ')}`);
         } else {
-          console.log(`[RTMS API] ⚠️ No stored config found for session ${sessionId}`);
+          console.log(`[RTMS API] ⚠️ No pending config found to migrate for session ${sessionId}`);
           console.log(`[RTMS API] 💡 Will use default agents from config.json`);
         }
       } else {
         console.log(`[RTMS API] ✅ Found stored config for session ${sessionId} with ${sessionConfig.agents.length} agents`);
+        console.log(`[RTMS API] 📋 Agents: ${sessionConfig.agents.map(a => a.name).join(', ')}`);
       }
       
       // Process webhook in RTMS client (establishes connection)

@@ -64,14 +64,42 @@ export function migratePendingConfigToSession(rtmsSessionId: string, meetingId?:
   // Find most recent pending config
   let pendingConfig: SessionConfig | null = null;
   let latestTime = 0;
+  const allPendingConfigs: SessionConfig[] = [];
 
+  // First, collect all pending configs for logging
   for (const config of sessionConfigs.values()) {
-    if (config.isPending && config.createdAt > latestTime) {
-      // If meetingId provided, try to match it
-      if (!meetingId || config.meetingId === meetingId) {
-        pendingConfig = config;
-        latestTime = config.createdAt;
+    if (config.isPending) {
+      allPendingConfigs.push(config);
+      if (config.createdAt > latestTime) {
+        // If meetingId provided, try to match it
+        if (!meetingId || config.meetingId === meetingId) {
+          pendingConfig = config;
+          latestTime = config.createdAt;
+        }
       }
+    }
+  }
+
+  // Log what we found
+  if (allPendingConfigs.length > 0) {
+    console.log(`[Session Config] 🔍 Found ${allPendingConfigs.length} pending config(s):`);
+    allPendingConfigs.forEach(c => {
+      console.log(`[Session Config]   - ${c.sessionId} (created: ${new Date(c.createdAt).toISOString()}, agents: ${c.agents.length}, meetingId: ${c.meetingId || 'none'})`);
+    });
+  } else {
+    console.log(`[Session Config] ⚠️ No pending configs found in storage`);
+  }
+
+  // If no match with meetingId, use most recent pending config anyway (within last 5 minutes)
+  if (!pendingConfig && allPendingConfigs.length > 0) {
+    const now = Date.now();
+    const recentConfigs = allPendingConfigs
+      .filter(c => now - c.createdAt < 300000) // Last 5 minutes
+      .sort((a, b) => b.createdAt - a.createdAt);
+    
+    if (recentConfigs.length > 0) {
+      pendingConfig = recentConfigs[0];
+      console.log(`[Session Config] 📌 Using most recent pending config (within 5 min): ${pendingConfig.sessionId}`);
     }
   }
 
@@ -90,9 +118,11 @@ export function migratePendingConfigToSession(rtmsSessionId: string, meetingId?:
 
     sessionConfigs.set(rtmsSessionId, newConfig);
     console.log(`[Session Config] 🔄 Migrated pending config to RTMS session: ${rtmsSessionId}`);
+    console.log(`[Session Config] 📋 Migrated agents: ${newConfig.agents.map(a => a.name).join(', ')}`);
     return newConfig;
   }
 
+  console.log(`[Session Config] ❌ No suitable pending config found to migrate`);
   return null;
 }
 

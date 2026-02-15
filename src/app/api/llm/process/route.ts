@@ -188,8 +188,14 @@ export async function POST(request: NextRequest) {
       // Use session-specific mapping
       agentId = agentIdMap.get(agentResponse.agent) || agentResponse.agent;
     } else {
-      // Fallback: try to find in default config or use name as ID
-      agentId = agentResponse.agent;
+      // Fallback: map agent names to default agent IDs from default-agents.ts
+      const defaultAgentNameToId: Record<string, string> = {
+        'Dexter Lawyer': 'dexter-lawyer',
+        'Judy Lawyer': 'judy-lawyer-professional',
+        'Alex Young': 'young-passionate-lawyer',
+      };
+      agentId = defaultAgentNameToId[agentResponse.agent] || agentResponse.agent;
+      console.log(`[LLM] 🔄 Mapped agent name "${agentResponse.agent}" to ID "${agentId}"`);
     }
 
     const response: LLMProcessResponse = {
