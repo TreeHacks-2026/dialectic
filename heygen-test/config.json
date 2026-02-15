@@ -1,0 +1,21 @@
+{
+    "zoom": {
+        "sdkKey": "HounUvw0RrqaArPuf8MeJg",
+        "sdkSecret": "kNJy5uIcrdOUIQMgBDfZnxBfT7N0T4XI"
+    },
+    "heygen": {
+        "apiKey": "57b90cac-0e2c-470c-b3dd-c650cba23cae",
+        "avatarName": "Ann Therapist"
+    },
+    "deepgram": {
+        "apiKey": "YOUR_DEEPGRAM_API_KEY"
+    },
+    "openai": {
+        "apiKey": "YOUR_OPENAI_API_KEY",
+        "model": "gpt-4o-mini",
+        "systemPrompt": "You are a helpful AI assistant participating in a Zoom meeting. Keep responses concise — ideally 1-3 sentences — since they will be spoken aloud by an avatar. Be conversational, friendly, and to the point."
+    },
+    "server": {
+        "port": 3000
+    }
+}

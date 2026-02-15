@@ -1,0 +1,18 @@
+{
+  "name": "heygen-text-to-speech-mvp",
+  "version": "1.0.0",
+  "description": "Simple web app for HeyGen avatar text-to-speech",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": ["heygen", "avatar", "text-to-speech", "streaming"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@heygen/streaming-avatar": "^1.0.0",
+    "express": "^4.18.2",
+    "cors": "^2.8.5"
+  }
+}
