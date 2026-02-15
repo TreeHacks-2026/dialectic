@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: dialectic
+    runtime: node
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    healthCheckPath: /api/courses
+    envVars:
+      - key: ELASTICSEARCH_URL
+        sync: false
+      - key: ELASTICSEARCH_API_KEY
+        sync: false
+      - key: JINA_API_KEY
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: HEYGEN_API_KEY
+        sync: false
