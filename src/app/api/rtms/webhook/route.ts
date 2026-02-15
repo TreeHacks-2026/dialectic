@@ -118,17 +118,7 @@ function getRTMSClient(): RTMSClient {
           console.error(`[RTMS API] ❌ Failed to queue for avatar: ${sttResponse.status} ${errorText}`);
         } else {
           console.log(`[RTMS API] ✅ Queued LLM response for ${llmResult.agent} avatar`);
-          
-          // Add LLM response to meeting transcript
-          const sessionId = rtmsClient?.getCurrentSessionId() 
-            || meetingTranscriptManager.getCurrentSessionId()
-            || 'default-session';
-          meetingTranscriptManager.addLLMResponse(
-            sessionId,
-            llmResult.agent,
-            llmResult.response,
-            llmResult.processed_at
-          );
+          // Note: LLM response is automatically added to transcript by /api/zoom-stt POST handler
         }
       } catch (error) {
         console.error('[RTMS API] ❌ Error in LLM pipeline:', error);
