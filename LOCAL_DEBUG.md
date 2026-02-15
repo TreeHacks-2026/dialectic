@@ -17,7 +17,7 @@ ZM_RTMS_SECRET=your_zoom_client_secret
 ZOOM_WEBHOOK_SECRET=your_webhook_secret
 
 # LLM API Keys (NEW - required for multi-agent system)
-GEMINI_API_KEY=your_gemini_api_key
+CLAUDE_API_KEY=your_claude_api_key
 PERPLEXITY_API_KEY=your_perplexity_api_key
 
 # Optional: App URL for local testing
@@ -153,7 +153,7 @@ If you want to test the full pipeline locally:
 ### Issue: "Module not found: Can't resolve '@/config/config.json'"
 **Fix:** Make sure `src/config/config.json` exists
 
-### Issue: "GEMINI_API_KEY and PERPLEXITY_API_KEY must be set"
+### Issue: "CLAUDE_API_KEY and PERPLEXITY_API_KEY must be set"
 **Fix:** Add API keys to `.env` file
 
 ### Issue: "Build succeeds but runtime fails"

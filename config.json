@@ -21,8 +21,8 @@
             "name": "Alex"
         }
     ],
-    "gemini": {
-        "selectionModel": "gemini-2.0-flash"
+    "claude": {
+        "selectionModel": "claude-3-5-haiku-20241022"
     },
     "perplexity": {
         "responseModel": "sonar-pro"
