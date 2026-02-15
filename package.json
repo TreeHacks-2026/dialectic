@@ -1,0 +1,16 @@
+{
+  "name": "dialectic",
+  "private": true,
+  "scripts": {
+    "dev": "pnpm --filter web dev",
+    "build": "pnpm -r run build",
+    "lint": "pnpm -r run lint"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "packageManager": "pnpm@9.0.0",
+  "devDependencies": {
+    "pnpm": "^10.29.3"
+  }
+}
