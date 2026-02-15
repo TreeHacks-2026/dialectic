@@ -1,18 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 
-type Agent = "agent1" | "agent2" | "agent3";
-
-const VALID_AGENTS: Agent[] = ["agent1", "agent2", "agent3"];
-
 interface ZoomSttRequest {
-  agent: Agent;
+  agent: string;
   speaker: string;
   text: string;
   timestamp?: string;
 }
 
 interface QueuedMessage {
-  agent: Agent;
+  agent: string;
   speaker: string;
   text: string;
   timestamp: string;
@@ -38,9 +34,9 @@ export async function POST(request: NextRequest) {
     const body = (await request.json()) as ZoomSttRequest;
     const { agent, speaker, text, timestamp } = body;
 
-    if (!agent || !VALID_AGENTS.includes(agent)) {
+    if (!agent || typeof agent !== "string" || agent.trim().length === 0) {
       return NextResponse.json(
-        { error: "Agent is required and must be one of: agent1, agent2, agent3" },
+        { error: "Agent is required and must be a non-empty string" },
         { status: 400 }
       );
     }
@@ -60,7 +56,7 @@ export async function POST(request: NextRequest) {
     }
 
     const entry: QueuedMessage = {
-      agent,
+      agent: agent.trim(),
       speaker: speaker.trim(),
       text: text.trim(),
       timestamp: timestamp ?? new Date().toISOString(),

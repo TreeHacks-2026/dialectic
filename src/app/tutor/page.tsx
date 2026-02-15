@@ -1,33 +1,51 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
+import { AnimatePresence, motion } from "framer-motion";
 import AvatarPanel, {
   type AvatarPanelHandle,
 } from "@/components/avatar-panel";
+import AddAgentCard from "@/components/add-agent-card";
+import PopoutContainer from "@/components/popout-container";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
+
+const MAX_AGENTS = 6;
+
+const BADGE_PALETTE = [
+  { accent: "from-blue-500 to-cyan-400", badge: "bg-blue-500/20 text-blue-300 border-blue-500/30" },
+  { accent: "from-purple-500 to-pink-400", badge: "bg-purple-500/20 text-purple-300 border-purple-500/30" },
+  { accent: "from-emerald-500 to-teal-400", badge: "bg-emerald-500/20 text-emerald-300 border-emerald-500/30" },
+  { accent: "from-orange-500 to-amber-400", badge: "bg-orange-500/20 text-orange-300 border-orange-500/30" },
+  { accent: "from-rose-500 to-red-400", badge: "bg-rose-500/20 text-rose-300 border-rose-500/30" },
+];
+
+interface AgentEntry {
+  id: string;
+  label: string;
+  colorIndex: number;
+}
 
 interface SttMessage {
-  agent: "agent1" | "agent2" | "agent3";
+  agent: string;
   speaker: string;
   text: string;
   timestamp: string;
 }
 
+function generateId() {
+  return Math.random().toString(36).slice(2, 10);
+}
+
 export default function TutorPage() {
-  const agent1Ref = useRef<AvatarPanelHandle>(null);
-  const agent2Ref = useRef<AvatarPanelHandle>(null);
-  const agent3Ref = useRef<AvatarPanelHandle>(null);
+  const [agents, setAgents] = useState<AgentEntry[]>([]);
+  const agentRefsMap = useRef<Map<string, AvatarPanelHandle | null>>(new Map());
+  const nextAgentNumber = useRef(1);
+  const [poppedAgents, setPoppedAgents] = useState<Record<string, boolean>>({});
   const [log, setLog] = useState<SttMessage[]>([]);
   const [polling, setPolling] = useState(false);
   const logEndRef = useRef<HTMLDivElement>(null);
-
-  const agentRefs: Record<string, React.RefObject<AvatarPanelHandle | null>> = {
-    agent1: agent1Ref,
-    agent2: agent2Ref,
-    agent3: agent3Ref,
-  };
 
   // Auto-scroll the log
   useEffect(() => {
@@ -50,8 +68,8 @@ export default function TutorPage() {
         setLog((prev) => [...prev, ...messages]);
 
         for (const msg of messages) {
-          const ref = agentRefs[msg.agent];
-          ref?.current?.speak(msg.text);
+          const handle = agentRefsMap.current.get(msg.agent);
+          handle?.speak(msg.text);
         }
       } catch (err) {
         console.error("Polling error:", err);
@@ -59,93 +77,202 @@ export default function TutorPage() {
     }, 2000);
 
     return () => clearInterval(interval);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [polling]);
 
-  const agentBadgeColor = (agent: string) => {
-    switch (agent) {
-      case "agent1":
-        return "default";
-      case "agent2":
-        return "secondary";
-      case "agent3":
-        return "outline";
-      default:
-        return "default";
-    }
+  const addAgent = useCallback(() => {
+    setAgents((prev) => {
+      if (prev.length >= MAX_AGENTS) return prev;
+      const num = nextAgentNumber.current++;
+      return [
+        ...prev,
+        {
+          id: generateId(),
+          label: `Agent ${num}`,
+          colorIndex: (num - 1) % BADGE_PALETTE.length,
+        },
+      ];
+    });
+  }, []);
+
+  const removeAgent = useCallback((id: string) => {
+    agentRefsMap.current.delete(id);
+    setPoppedAgents((prev) => {
+      const next = { ...prev };
+      delete next[id];
+      return next;
+    });
+    setAgents((prev) => prev.filter((a) => a.id !== id));
+  }, []);
+
+  const togglePopout = useCallback((id: string) => {
+    setPoppedAgents((prev) => ({ ...prev, [id]: !prev[id] }));
+  }, []);
+
+  const restoreAgent = useCallback((id: string) => {
+    setPoppedAgents((prev) => ({ ...prev, [id]: false }));
+  }, []);
+
+  const getAgentBadgeClass = (agentId: string): string => {
+    const agent = agents.find((a) => a.id === agentId);
+    if (!agent) return BADGE_PALETTE[0].badge;
+    return BADGE_PALETTE[agent.colorIndex % BADGE_PALETTE.length].badge;
   };
 
+  const getAgentLabel = (agentId: string): string => {
+    const agent = agents.find((a) => a.id === agentId);
+    return agent?.label ?? agentId;
+  };
+
+  // Responsive grid columns based on total items (agents + add button)
+  const totalItems = agents.length + (agents.length < MAX_AGENTS ? 1 : 0);
+  const gridColsClass = useMemo(() => {
+    if (totalItems <= 1) return "grid-cols-1 max-w-md mx-auto";
+    if (totalItems <= 2) return "grid-cols-1 md:grid-cols-2 max-w-3xl mx-auto";
+    return "grid-cols-1 md:grid-cols-2 lg:grid-cols-3";
+  }, [totalItems]);
+
   return (
-    <div className="flex flex-col h-screen font-[family-name:var(--font-geist-sans)]">
+    <div className="flex flex-col h-screen font-[family-name:var(--font-geist-sans)] bg-[#06060c] text-white overflow-hidden">
+      {/* Animated background */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute -top-40 -left-40 w-[500px] h-[500px] bg-blue-600/[0.07] rounded-full blur-[120px] animate-pulse" />
+        <div className="absolute top-1/3 -right-32 w-[400px] h-[400px] bg-indigo-500/[0.06] rounded-full blur-[100px]" />
+        <div className="absolute -bottom-32 left-1/3 w-[350px] h-[350px] bg-cyan-500/[0.05] rounded-full blur-[100px]" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-purple-600/[0.03] rounded-full blur-[150px]" />
+      </div>
+
       {/* Top bar */}
-      <header className="flex items-center justify-between px-4 py-3 border-b">
+      <motion.header
+        initial={{ y: -20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.5, ease: "easeOut" }}
+        className="relative z-10 flex items-center justify-between px-6 py-3.5 border-b border-white/[0.06] bg-white/[0.03] backdrop-blur-2xl"
+      >
         <Link
           href="/"
-          className="text-lg font-bold tracking-tight hover:opacity-80 transition-opacity"
+          className="text-lg font-bold tracking-tight bg-gradient-to-r from-white to-white/70 bg-clip-text text-transparent hover:from-white hover:to-white/90 transition-all"
         >
           Dialectic
         </Link>
-        <div className="flex items-center gap-4">
-          <label className="flex items-center gap-2 text-sm">
+        <div className="flex items-center gap-5">
+          <label className="flex items-center gap-2 text-sm text-white/50 hover:text-white/70 transition-colors cursor-pointer">
             <input
               type="checkbox"
               checked={polling}
               onChange={(e) => setPolling(e.target.checked)}
-              className="rounded"
+              className="rounded bg-white/10 border-white/20 accent-blue-500"
             />
             Poll Zoom STT
           </label>
           <Link
             href="/test"
-            className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+            className="text-sm text-white/30 hover:text-white/60 transition-colors"
           >
             API Testing
           </Link>
         </div>
-      </header>
+      </motion.header>
 
       {/* Avatars grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4">
-        <AvatarPanel ref={agent1Ref} label="Agent 1" />
-        <AvatarPanel ref={agent2Ref} label="Agent 2" />
-        <AvatarPanel ref={agent3Ref} label="Agent 3" />
-      </div>
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.15 }}
+        className={cn("relative z-10 grid gap-4 p-5", gridColsClass)}
+      >
+        <AnimatePresence mode="popLayout">
+          {agents.map((agent) => (
+            <motion.div
+              key={agent.id}
+              layout
+              initial={{ opacity: 0, scale: 0.85, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.85, y: -10 }}
+              transition={{ type: "spring", stiffness: 350, damping: 30 }}
+            >
+              <PopoutContainer
+                label={agent.label}
+                isPopped={!!poppedAgents[agent.id]}
+                onTogglePopout={() => togglePopout(agent.id)}
+                onRestore={() => restoreAgent(agent.id)}
+              >
+                <AvatarPanel
+                  ref={(handle) => {
+                    if (handle) agentRefsMap.current.set(agent.id, handle);
+                    else agentRefsMap.current.delete(agent.id);
+                  }}
+                  id={agent.id}
+                  label={agent.label}
+                  colorAccent={BADGE_PALETTE[agent.colorIndex % BADGE_PALETTE.length].accent}
+                  onRemove={() => removeAgent(agent.id)}
+                  onRequestPopout={() => togglePopout(agent.id)}
+                  isPoppedOut={!!poppedAgents[agent.id]}
+                />
+              </PopoutContainer>
+            </motion.div>
+          ))}
+        </AnimatePresence>
+
+        {agents.length < MAX_AGENTS && (
+          <motion.div
+            layout
+            transition={{ type: "spring", stiffness: 350, damping: 30 }}
+          >
+            <AddAgentCard
+              onClick={addAgent}
+              disabled={agents.length >= MAX_AGENTS}
+            />
+          </motion.div>
+        )}
+      </motion.div>
 
       {/* Message log */}
-      <div className="flex-1 overflow-hidden px-4 pb-4">
-        <Card className="flex flex-col h-full">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base">Message Log</CardTitle>
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.3 }}
+        className="relative z-10 flex-1 overflow-hidden px-5 pb-5"
+      >
+        <Card className="flex flex-col h-full bg-white/[0.03] backdrop-blur-2xl border-white/[0.06] shadow-[0_8px_40px_rgba(0,0,0,0.4)] rounded-2xl">
+          <CardHeader className="pb-3 px-5 pt-4">
+            <CardTitle className="text-sm font-semibold text-white/60 uppercase tracking-wider">Message Log</CardTitle>
           </CardHeader>
           <CardContent className="flex-1 overflow-hidden p-0">
-            <div className="h-full overflow-y-auto px-6 pb-4 space-y-3">
+            <div className="h-full overflow-y-auto px-5 pb-4 space-y-2.5">
               {log.length === 0 && (
-                <p className="text-sm text-muted-foreground text-center pt-8">
+                <p className="text-sm text-white/20 text-center pt-10">
                   Enable polling and send messages via the Zoom STT API to see
                   them here.
                 </p>
               )}
 
               {log.map((msg, i) => (
-                <div key={i} className="flex items-start gap-2">
-                  <Badge
-                    variant={agentBadgeColor(msg.agent) as "default" | "secondary" | "outline"}
-                    className="shrink-0 mt-0.5"
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  className="flex items-start gap-2.5 py-1"
+                >
+                  <span
+                    className={cn(
+                      "shrink-0 mt-0.5 px-2.5 py-0.5 text-xs font-medium rounded-full border",
+                      getAgentBadgeClass(msg.agent)
+                    )}
                   >
-                    {msg.agent}
-                  </Badge>
+                    {getAgentLabel(msg.agent)}
+                  </span>
                   <div className="text-sm">
-                    <span className="font-medium">{msg.speaker}:</span>{" "}
-                    <span className="text-muted-foreground">{msg.text}</span>
+                    <span className="font-medium text-white/70">{msg.speaker}:</span>{" "}
+                    <span className="text-white/40">{msg.text}</span>
                   </div>
-                </div>
+                </motion.div>
               ))}
 
               <div ref={logEndRef} />
             </div>
           </CardContent>
         </Card>
-      </div>
+      </motion.div>
     </div>
   );
 }
