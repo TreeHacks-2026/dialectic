@@ -144,7 +144,17 @@ class MeetingTranscriptManager {
    */
   clearSession(sessionId: string): void {
     this.transcripts.delete(sessionId);
+    if (this.currentSessionId === sessionId) {
+      this.currentSessionId = null;
+    }
     console.log(`[Transcript Manager] 🗑️ Cleared session: ${sessionId}`);
+  }
+
+  /**
+   * Get all active session IDs (sessions with transcripts)
+   */
+  getAllActiveSessions(): string[] {
+    return Array.from(this.transcripts.keys());
   }
 }
 

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 // Import RTMSClient from source - Next.js will transpile it
 import { RTMSClient } from '../../../../../packages/transcript-service/src/rtms-client';
 import { meetingTranscriptManager } from '@/lib/meeting-transcript';
-import { saveAnalysis } from '@/lib/analysis-storage';
+import { triggerMeetingAnalysis } from '@/lib/meeting-analysis';
 
 // Singleton RTMS client
 let rtmsClient: RTMSClient | null = null;
@@ -49,7 +49,17 @@ function getRTMSClient(): RTMSClient {
       });
 
       // Add to meeting transcript manager
-      const sessionId = rtmsClient?.getCurrentSessionId() || 'default-session';
+      // Get session ID with proper fallback chain
+      const sessionId = rtmsClient?.getCurrentSessionId() 
+        || meetingTranscriptManager.getCurrentSessionId()
+        || 'default-session';
+      
+      // Auto-start session if not started yet (safety net)
+      if (!meetingTranscriptManager.getCurrentSessionId() && sessionId !== 'default-session') {
+        console.log(`[RTMS API] ⚠️ Auto-starting session from first transcript: ${sessionId}`);
+        meetingTranscriptManager.startSession(sessionId);
+      }
+      
       meetingTranscriptManager.addUserTranscript(
         sessionId,
         event.speaker_name,
@@ -110,7 +120,9 @@ function getRTMSClient(): RTMSClient {
           console.log(`[RTMS API] ✅ Queued LLM response for ${llmResult.agent} avatar`);
           
           // Add LLM response to meeting transcript
-          const sessionId = rtmsClient?.getCurrentSessionId() || 'default-session';
+          const sessionId = rtmsClient?.getCurrentSessionId() 
+            || meetingTranscriptManager.getCurrentSessionId()
+            || 'default-session';
           meetingTranscriptManager.addLLMResponse(
             sessionId,
             llmResult.agent,
@@ -124,20 +136,36 @@ function getRTMSClient(): RTMSClient {
     }
   });
 
-  // Listen for meeting start to initialize transcript tracking
+  // Listen for RTMS client events as SECONDARY/backup triggers
+  // (Primary source is webhook events, but these provide redundancy)
   rtmsClient.on('connected', (streamId) => {
-    console.log(`[RTMS API] 🔗 RTMS connected, stream ID: ${streamId}`);
+    console.log(`[RTMS API] 🔗 RTMS client connected event, stream ID: ${streamId}`);
     if (streamId) {
-      meetingTranscriptManager.startSession(streamId);
+      // Only start session if not already started (webhook is primary)
+      const currentSession = meetingTranscriptManager.getCurrentSessionId();
+      if (currentSession !== streamId) {
+        console.log(`[RTMS API] 📝 Starting session from client event (backup): ${streamId}`);
+        meetingTranscriptManager.startSession(streamId);
+      } else {
+        console.log(`[RTMS API] ✅ Session ${streamId} already started (from webhook)`);
+      }
     }
   });
 
-  // Listen for meeting end to trigger analysis
+  // Listen for meeting end as backup trigger
   rtmsClient.on('disconnected', async (streamId) => {
-    console.log(`[RTMS API] 🔌 RTMS disconnected, stream ID: ${streamId}`);
+    console.log(`[RTMS API] 🔌 RTMS client disconnected event, stream ID: ${streamId}`);
     if (streamId) {
-      await triggerMeetingAnalysis(streamId);
-      meetingTranscriptManager.endSession(streamId);
+      // Check if analysis was already triggered by webhook
+      const sessionId = streamId || meetingTranscriptManager.getCurrentSessionId();
+      if (sessionId) {
+        console.log(`[RTMS API] 🔍 Backup: Triggering analysis from disconnected event for session: ${sessionId}`);
+        // Trigger analysis asynchronously (don't block)
+        triggerMeetingAnalysis(sessionId).catch((error) => {
+          console.error('[RTMS API] ❌ Error in backup analysis trigger:', error);
+        });
+        meetingTranscriptManager.endSession(sessionId);
+      }
     }
   });
 
@@ -148,97 +176,118 @@ function getRTMSClient(): RTMSClient {
   return rtmsClient;
 }
 
+
 /**
- * Trigger analysis when meeting ends
+ * Extract session ID from webhook payload (most reliable source)
  */
-async function triggerMeetingAnalysis(sessionId: string): Promise<void> {
-  try {
-    const entryCount = meetingTranscriptManager.getEntryCount(sessionId);
-    if (entryCount === 0) {
-      console.log(`[RTMS API] ⚠️ No transcripts to analyze for session ${sessionId}`);
-      return;
-    }
-
-    console.log(`[RTMS API] 🔍 Meeting ended. Analyzing ${entryCount} transcript entries...`);
-
-    // Get transcript in plain text format (works with analyze API)
-    const plainText = meetingTranscriptManager.getPlainTextTranscript(sessionId);
-    
-    if (!plainText || plainText.trim().length === 0) {
-      console.log(`[RTMS API] ⚠️ Empty transcript for session ${sessionId}`);
-      return;
-    }
-
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 
-                  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 
-                  process.env.RENDER_EXTERNAL_URL || 
-                  'http://localhost:3000');
-
-    // Call analyze API
-    const analyzeResponse = await fetch(`${appUrl}/api/analyze`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        rawText: plainText,
-        sessionId: sessionId,
-      }),
-    });
-
-    if (!analyzeResponse.ok) {
-      const errorText = await analyzeResponse.text();
-      console.error(`[RTMS API] ❌ Analysis failed: ${analyzeResponse.status} ${errorText}`);
-      return;
-    }
-
-    const analysisResult = await analyzeResponse.json();
-    const results = analysisResult.results || [analysisResult];
-    
-    console.log(`[RTMS API] ✅ Analysis complete for session ${sessionId}`);
-    console.log(`[RTMS API] 📊 Analyzed ${results.length} students`);
-
-    // Store analysis result in database
-    try {
-      const stored = saveAnalysis(sessionId, plainText, results);
-      console.log(`[RTMS API] 💾 Stored analysis with ID: ${stored.id}`);
-    } catch (error) {
-      console.error('[RTMS API] ❌ Error storing analysis:', error);
-      // Don't fail the whole process if storage fails
-    }
-    
-  } catch (error) {
-    console.error('[RTMS API] ❌ Error triggering analysis:', error);
+function extractSessionIdFromWebhook(webhookData: any): string | null {
+  const payload = webhookData.payload || {};
+  
+  // Try rtms_stream_id first (most specific)
+  if (payload.rtms_stream_id) {
+    return payload.rtms_stream_id as string;
   }
+  
+  // Fallback to meeting_uuid
+  if (payload.meeting_uuid) {
+    return payload.meeting_uuid as string;
+  }
+  
+  return null;
 }
 
 /**
  * POST handler for Zoom RTMS webhooks
+ * Uses webhook events as PRIMARY source of truth for session lifecycle
  */
 export async function POST(request: NextRequest) {
   try {
     console.log('[RTMS API] 📥 Webhook request received');
     const webhookData = await request.json();
-    console.log(`[RTMS API] 📥 Webhook event: ${webhookData.event || 'unknown'}`);
-    console.log(`[RTMS API] 📥 Webhook payload keys:`, Object.keys(webhookData.payload || {}));
-
-    const client = getRTMSClient();
     const event = webhookData.event || 'unknown';
+    const payload = webhookData.payload || {};
     
-    // Handle meeting stopped event to trigger analysis
-    if (event === 'meeting.rtms_stopped') {
-      const sessionId = client.getCurrentSessionId();
+    console.log(`[RTMS API] 📥 Webhook event: ${event}`);
+    console.log(`[RTMS API] 📥 Webhook payload keys:`, Object.keys(payload));
+    
+    // Extract session ID from webhook payload (most reliable)
+    const sessionIdFromWebhook = extractSessionIdFromWebhook(webhookData);
+    
+    const client = getRTMSClient();
+    
+    // ============================================
+    // PRIMARY: Handle meeting lifecycle via webhooks
+    // ============================================
+    
+    if (event === 'meeting.rtms_started') {
+      // Meeting started - start tracking session
+      const sessionId = sessionIdFromWebhook || client.getCurrentSessionId() || 'unknown-session';
+      
+      console.log(`[RTMS API] 🟢 Meeting started - Session ID: ${sessionId}`);
+      console.log(`[RTMS API] 📝 Starting transcript tracking for session: ${sessionId}`);
+      
+      // Clear any old data for this session (in case of restart)
+      meetingTranscriptManager.clearSession(sessionId);
+      
+      // Start new session
+      meetingTranscriptManager.startSession(sessionId);
+      
+      // Process webhook in RTMS client (establishes connection)
+      client.handleWebhookEvent(webhookData);
+      
+      console.log(`[RTMS API] ✅ Session ${sessionId} initialized and ready for transcripts`);
+    }
+    else if (event === 'meeting.rtms_stopped') {
+      // Meeting stopped - trigger analysis
+      // Try multiple sources for session ID (in order of reliability)
+      const sessionId = sessionIdFromWebhook 
+        || client.getCurrentSessionId() 
+        || meetingTranscriptManager.getCurrentSessionId()
+        || null;
+      
       if (sessionId) {
-        console.log(`[RTMS API] 🏁 Meeting stopped, triggering analysis for session: ${sessionId}`);
-        // Trigger analysis asynchronously (don't wait for it)
+        console.log(`[RTMS API] 🔴 Meeting stopped - Session ID: ${sessionId}`);
+        console.log(`[RTMS API] 🔍 Triggering analysis for session: ${sessionId}`);
+        
+        // Process webhook in RTMS client first (cleans up connections)
+        client.handleWebhookEvent(webhookData);
+        
+        // Trigger analysis asynchronously (don't block webhook response)
         triggerMeetingAnalysis(sessionId).catch((error) => {
           console.error('[RTMS API] ❌ Error in async analysis:', error);
         });
+      } else {
+        console.warn('[RTMS API] ⚠️ Meeting stopped but no session ID found. Checking all active sessions...');
+        
+        // Fallback: analyze all active sessions
+        const allSessions = meetingTranscriptManager.getAllActiveSessions();
+        if (allSessions.length > 0) {
+          console.log(`[RTMS API] 🔍 Found ${allSessions.length} active session(s), analyzing all...`);
+          for (const sid of allSessions) {
+            triggerMeetingAnalysis(sid).catch((error) => {
+              console.error(`[RTMS API] ❌ Error analyzing session ${sid}:`, error);
+            });
+          }
+        } else {
+          console.warn('[RTMS API] ⚠️ No active sessions found to analyze');
+        }
+        
+        // Still process webhook to clean up RTMS client
+        client.handleWebhookEvent(webhookData);
       }
     }
-    
-    client.handleWebhookEvent(webhookData);
+    else {
+      // Other events - just pass to RTMS client
+      console.log(`[RTMS API] 📨 Processing non-lifecycle event: ${event}`);
+      client.handleWebhookEvent(webhookData);
+    }
 
     console.log(`[RTMS API] ✅ Webhook processed successfully`);
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ 
+      success: true,
+      event,
+      sessionId: sessionIdFromWebhook || client.getCurrentSessionId() || null
+    });
   } catch (error) {
     console.error('[RTMS API] ❌ Error processing webhook:', error);
     console.error('[RTMS API] ❌ Error stack:', error instanceof Error ? error.stack : 'No stack');
@@ -257,12 +306,17 @@ export async function GET() {
     console.log('[RTMS API] 📊 Status check requested');
     const client = getRTMSClient();
     
+    const currentSessionId = client.getCurrentSessionId() || meetingTranscriptManager.getCurrentSessionId();
+    const activeSessions = meetingTranscriptManager.getAllActiveSessions();
+    
     const status = {
       status: 'ok',
       rtms_configured: true,
       rtms_connected: client.isConnected(),
-      session_id: client.getCurrentSessionId(),
+      session_id: currentSessionId,
+      active_sessions: activeSessions,
       transcripts_received: transcriptQueue.length,
+      transcript_entries: currentSessionId ? meetingTranscriptManager.getEntryCount(currentSessionId) : 0,
       recent_transcripts: transcriptQueue.slice(-10), // Last 10 transcripts
       webhook_url: process.env.NEXT_PUBLIC_APP_URL || 
                    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 
@@ -275,11 +329,14 @@ export async function GET() {
   } catch (error) {
     // Return 200 for health check even if RTMS isn't configured
     // This allows the service to be marked as healthy
+    const activeSessions = meetingTranscriptManager.getAllActiveSessions();
+    
     const status = {
       status: 'ok',
       rtms_configured: false,
       rtms_connected: false,
       session_id: null,
+      active_sessions: activeSessions,
       transcripts_received: transcriptQueue.length,
       recent_transcripts: [],
       message: error instanceof Error ? error.message : 'RTMS not configured',
