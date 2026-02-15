@@ -66,7 +66,7 @@ function mapAgentToAvatar(agentName: string): 'agent1' | 'agent2' | 'agent3' {
 
 /**
  * Real LLM processing endpoint using multi-agent system
- * Uses Gemini for agent selection and Perplexity for responses
+ * Uses Claude for agent selection and Perplexity for responses
  */
 export async function POST(request: NextRequest) {
   try {
