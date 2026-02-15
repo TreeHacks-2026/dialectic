@@ -51,7 +51,7 @@ export default function Home() {
           initial={{ y: -20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.5 }}
-          className="flex items-center justify-between"
+          className="flex items-center justify-between rounded-2xl border border-white/40 bg-white/60 px-6 py-4 shadow-[0_8px_32px_rgba(0,0,0,0.08)] backdrop-blur-2xl"
         >
           <div className="flex items-center gap-12">
             <h1 className="text-2xl font-bold tracking-tight text-blue-600">RNT</h1>
@@ -233,102 +233,51 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Right Side - Exchange Interface */}
+          {/* Right Side - Dialectic Hero */}
           <motion.div
             initial={{ opacity: 0, x: 50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.3, duration: 0.6 }}
-            className="space-y-8"
+            className="flex flex-col items-center justify-center space-y-12 text-center"
           >
+            {/* Dialectic Title */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.5, duration: 0.5 }}
-              className="space-y-4"
             >
-              <h2 className="text-balance text-5xl font-bold leading-tight tracking-tight text-foreground lg:text-6xl">
-                Find, match, and hire designers secure
-              </h2>
+              <h1 className="text-balance bg-gradient-to-br from-gray-900 via-blue-800 to-blue-600 bg-clip-text text-7xl font-bold tracking-tighter text-transparent lg:text-8xl">
+                Dialectic
+              </h1>
+              <p className="mt-4 text-lg font-medium text-gray-600">
+                AI Teaching Assistant with Avatar Office Hours
+              </p>
             </motion.div>
 
-            {/* Exchange Card */}
+            {/* Get Started Button */}
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.6, duration: 0.5 }}
-              className="rounded-3xl border border-white/40 bg-white/80 p-8 shadow-2xl backdrop-blur-xl"
+              transition={{ delay: 0.7, duration: 0.5 }}
             >
-              <div className="space-y-6">
-                {/* Tabs */}
-                <div className="flex gap-2">
-                  <button className="rounded-xl bg-blue-50 px-6 py-2 text-sm font-semibold text-blue-600">
-                    Job Search
-                  </button>
-                  <button className="rounded-xl px-6 py-2 text-sm font-medium text-muted-foreground hover:text-blue-600">
-                    Portfolio Match
-                  </button>
-                </div>
-
-                {/* You're Looking For */}
-                <div className="space-y-3">
-                  <label className="text-sm font-medium text-muted-foreground">
-                    You&apos;re looking for
-                  </label>
-                  <div className="flex items-center justify-between rounded-2xl border-2 border-muted p-4">
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-orange-100">
-                        <Building2 className="h-5 w-5 text-orange-600" />
-                      </div>
-                      <div>
-                        <div className="text-sm font-bold">Interior Designer</div>
-                        <div className="text-xs text-muted-foreground">Role</div>
-                      </div>
-                    </div>
-                    <ChevronDown className="h-5 w-5 text-muted-foreground" />
-                  </div>
-                  <div className="text-xs text-muted-foreground">
-                    Experience range: 2-5 years
-                  </div>
-                </div>
-
-                {/* Swap Button */}
-                <div className="flex justify-center">
-                  <button className="flex h-10 w-10 items-center justify-center rounded-xl border-2 border-muted bg-background hover:bg-muted">
-                    <ArrowDownUp className="h-4 w-4" />
-                  </button>
-                </div>
-
-                {/* You Get */}
-                <div className="space-y-3">
-                  <label className="text-sm font-medium text-muted-foreground">
-                    You get
-                  </label>
-                  <div className="flex items-center justify-between rounded-2xl border-2 border-muted p-4">
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-teal-100">
-                        <Briefcase className="h-5 w-5 text-teal-600" />
-                      </div>
-                      <div>
-                        <div className="text-sm font-bold">Qualified Candidates</div>
-                        <div className="text-xs text-muted-foreground">Match</div>
-                      </div>
-                    </div>
-                    <ChevronDown className="h-5 w-5 text-muted-foreground" />
-                  </div>
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="text-muted-foreground">
-                      Average match: 156 designers
-                    </span>
-                    <span className="text-green-600">(+ 23%)</span>
-                  </div>
-                </div>
-
-                {/* Exchange Button */}
-                <Button className="w-full rounded-2xl bg-blue-600 py-6 text-base font-semibold text-white hover:bg-blue-700">
-                  Search now
-                </Button>
-              </div>
+              <Button
+                size="lg"
+                className="group relative overflow-hidden rounded-2xl border border-white/40 bg-white/70 px-12 py-6 text-lg font-semibold text-gray-900 shadow-[0_8px_32px_rgba(0,0,0,0.12)] backdrop-blur-2xl transition-all hover:bg-white/80 hover:shadow-[0_8px_32px_rgba(0,0,0,0.16)]"
+              >
+                <span className="relative z-10">Get Started</span>
+                <div className="absolute inset-0 -z-0 bg-gradient-to-r from-blue-400/20 to-cyan-400/20 opacity-0 transition-opacity group-hover:opacity-100" />
+              </Button>
             </motion.div>
+
+            {/* Optional subtitle */}
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.9, duration: 0.5 }}
+              className="max-w-md text-sm leading-relaxed text-gray-500"
+            >
+              Experience the future of learning with our AI-powered teaching assistant. Connect with experts and get instant help through interactive avatar sessions.
+            </motion.p>
           </motion.div>
         </div>
       </main>
