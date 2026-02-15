@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 // Import RTMSClient from source - Next.js will transpile it
 import { RTMSClient } from '../../../../../packages/transcript-service/src/rtms-client';
+import { meetingTranscriptManager } from '@/lib/meeting-transcript';
 
 // Singleton RTMS client
 let rtmsClient: RTMSClient | null = null;
@@ -45,6 +46,15 @@ function getRTMSClient(): RTMSClient {
         timestamp: event.ts_ms,
         is_final: event.is_final,
       });
+
+      // Add to meeting transcript manager
+      const sessionId = rtmsClient?.getCurrentSessionId() || 'default-session';
+      meetingTranscriptManager.addUserTranscript(
+        sessionId,
+        event.speaker_name,
+        event.text,
+        event.ts_ms
+      );
 
       // Send to LLM processing layer
       try {
@@ -97,10 +107,36 @@ function getRTMSClient(): RTMSClient {
           console.error(`[RTMS API] ❌ Failed to queue for avatar: ${sttResponse.status} ${errorText}`);
         } else {
           console.log(`[RTMS API] ✅ Queued LLM response for ${llmResult.agent} avatar`);
+          
+          // Add LLM response to meeting transcript
+          const sessionId = rtmsClient?.getCurrentSessionId() || 'default-session';
+          meetingTranscriptManager.addLLMResponse(
+            sessionId,
+            llmResult.agent,
+            llmResult.response,
+            llmResult.processed_at
+          );
         }
       } catch (error) {
         console.error('[RTMS API] ❌ Error in LLM pipeline:', error);
       }
+    }
+  });
+
+  // Listen for meeting start to initialize transcript tracking
+  rtmsClient.on('connected', (streamId) => {
+    console.log(`[RTMS API] 🔗 RTMS connected, stream ID: ${streamId}`);
+    if (streamId) {
+      meetingTranscriptManager.startSession(streamId);
+    }
+  });
+
+  // Listen for meeting end to trigger analysis
+  rtmsClient.on('disconnected', async (streamId) => {
+    console.log(`[RTMS API] 🔌 RTMS disconnected, stream ID: ${streamId}`);
+    if (streamId) {
+      await triggerMeetingAnalysis(streamId);
+      meetingTranscriptManager.endSession(streamId);
     }
   });
 
@@ -109,6 +145,60 @@ function getRTMSClient(): RTMSClient {
   });
 
   return rtmsClient;
+}
+
+/**
+ * Trigger analysis when meeting ends
+ */
+async function triggerMeetingAnalysis(sessionId: string): Promise<void> {
+  try {
+    const entryCount = meetingTranscriptManager.getEntryCount(sessionId);
+    if (entryCount === 0) {
+      console.log(`[RTMS API] ⚠️ No transcripts to analyze for session ${sessionId}`);
+      return;
+    }
+
+    console.log(`[RTMS API] 🔍 Meeting ended. Analyzing ${entryCount} transcript entries...`);
+
+    // Get transcript in plain text format (works with analyze API)
+    const plainText = meetingTranscriptManager.getPlainTextTranscript(sessionId);
+    
+    if (!plainText || plainText.trim().length === 0) {
+      console.log(`[RTMS API] ⚠️ Empty transcript for session ${sessionId}`);
+      return;
+    }
+
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 
+                  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 
+                  process.env.RENDER_EXTERNAL_URL || 
+                  'http://localhost:3000');
+
+    // Call analyze API
+    const analyzeResponse = await fetch(`${appUrl}/api/analyze`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        rawText: plainText,
+        sessionId: sessionId,
+      }),
+    });
+
+    if (!analyzeResponse.ok) {
+      const errorText = await analyzeResponse.text();
+      console.error(`[RTMS API] ❌ Analysis failed: ${analyzeResponse.status} ${errorText}`);
+      return;
+    }
+
+    const analysisResult = await analyzeResponse.json();
+    console.log(`[RTMS API] ✅ Analysis complete for session ${sessionId}`);
+    console.log(`[RTMS API] 📊 Analyzed ${analysisResult.results?.length || 0} students`);
+
+    // Store analysis result (you can extend this to save to database or notify users)
+    // For now, we just log it. You could emit an event or store it.
+    
+  } catch (error) {
+    console.error('[RTMS API] ❌ Error triggering analysis:', error);
+  }
 }
 
 /**
@@ -122,6 +212,20 @@ export async function POST(request: NextRequest) {
     console.log(`[RTMS API] 📥 Webhook payload keys:`, Object.keys(webhookData.payload || {}));
 
     const client = getRTMSClient();
+    const event = webhookData.event || 'unknown';
+    
+    // Handle meeting stopped event to trigger analysis
+    if (event === 'meeting.rtms_stopped') {
+      const sessionId = client.getCurrentSessionId();
+      if (sessionId) {
+        console.log(`[RTMS API] 🏁 Meeting stopped, triggering analysis for session: ${sessionId}`);
+        // Trigger analysis asynchronously (don't wait for it)
+        triggerMeetingAnalysis(sessionId).catch((error) => {
+          console.error('[RTMS API] ❌ Error in async analysis:', error);
+        });
+      }
+    }
+    
     client.handleWebhookEvent(webhookData);
 
     console.log(`[RTMS API] ✅ Webhook processed successfully`);

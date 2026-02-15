@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { meetingTranscriptManager } from "@/lib/meeting-transcript";
 
 type Agent = "agent1" | "agent2" | "agent3";
 
@@ -67,6 +68,11 @@ export async function POST(request: NextRequest) {
     };
 
     messageQueue.push(entry);
+
+    // Also add to meeting transcript manager
+    // Try to get current session ID from RTMS, or use a default
+    const sessionId = meetingTranscriptManager.getCurrentSessionId() || 'default-session';
+    meetingTranscriptManager.addLLMResponse(sessionId, agent, text, entry.timestamp);
 
     return NextResponse.json({
       success: true,
