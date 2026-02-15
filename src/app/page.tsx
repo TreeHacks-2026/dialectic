@@ -41,6 +41,18 @@ export default function Home() {
             </CardHeader>
           </Card>
         </Link>
+
+        <Link href="/dashboard" className="block">
+          <Card className="h-full hover:shadow-lg transition-shadow cursor-pointer border-2 hover:border-primary/40">
+            <CardHeader>
+              <CardTitle className="text-lg">Debate Analysis</CardTitle>
+              <CardDescription>
+                Analyze meeting transcripts and get detailed feedback on student
+                debate performance with rubric-based scoring.
+              </CardDescription>
+            </CardHeader>
+          </Card>
+        </Link>
       </div>
 
       <Button asChild size="lg">
