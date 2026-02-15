@@ -33,12 +33,12 @@ function getRTMSClient(): RTMSClient {
 
   console.log('[RTMS API] ✅ RTMS client initialized');
 
-  // Listen for transcript events and store them
-  rtmsClient.on('transcript', (event) => {
+  // Listen for transcript events and process through full pipeline
+  rtmsClient.on('transcript', async (event) => {
     if (event.is_final) {
       console.log(`[RTMS API] 📝 Transcript: ${event.speaker_name}: ${event.text}`);
       
-      // Store transcript in queue (for future LLM processing)
+      // Store transcript in queue
       transcriptQueue.push({
         speaker_name: event.speaker_name,
         text: event.text,
@@ -46,8 +46,61 @@ function getRTMSClient(): RTMSClient {
         is_final: event.is_final,
       });
 
-      // TODO: Later, send to LLM processing layer here
-      // For now, just store it
+      // Send to LLM processing layer
+      try {
+        const appUrl = process.env.NEXT_PUBLIC_APP_URL || 
+                      (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 
+                      process.env.RENDER_EXTERNAL_URL || 
+                      'http://localhost:3000');
+
+        console.log(`[RTMS API] 🔄 Sending to LLM processing layer...`);
+
+        // Call LLM processing endpoint
+        const llmResponse = await fetch(`${appUrl}/api/llm/process`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            transcript: event.text,
+            speaker: event.speaker_name,
+            timestamp: event.ts_ms,
+          }),
+        });
+
+        if (!llmResponse.ok) {
+          const errorText = await llmResponse.text();
+          console.error(`[RTMS API] ❌ LLM processing failed: ${llmResponse.status} ${errorText}`);
+          return;
+        }
+
+        const llmResult = await llmResponse.json() as {
+          response: string;
+          agent: 'agent1' | 'agent2' | 'agent3';
+          processed_at: string;
+        };
+        
+        console.log(`[RTMS API] ✅ LLM processed, assigned to ${llmResult.agent}`);
+
+        // Forward LLM output to /api/zoom-stt queue for avatars
+        const sttResponse = await fetch(`${appUrl}/api/zoom-stt`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            agent: llmResult.agent,
+            speaker: 'AI Assistant',
+            text: llmResult.response,
+            timestamp: llmResult.processed_at,
+          }),
+        });
+
+        if (!sttResponse.ok) {
+          const errorText = await sttResponse.text();
+          console.error(`[RTMS API] ❌ Failed to queue for avatar: ${sttResponse.status} ${errorText}`);
+        } else {
+          console.log(`[RTMS API] ✅ Queued LLM response for ${llmResult.agent} avatar`);
+        }
+      } catch (error) {
+        console.error('[RTMS API] ❌ Error in LLM pipeline:', error);
+      }
     }
   });
 
