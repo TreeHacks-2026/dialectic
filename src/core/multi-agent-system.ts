@@ -61,25 +61,41 @@ export class MultiAgentSystem {
     }
 
     private async selectAndRespond(): Promise<AgentResponse> {
-        // 1. Select agent (small model, full transcript)
-        const fullTranscript = this.transcript.getFullText();
-        const selection = await this.selector.select(fullTranscript);
+        // 1. Get recent context for selection
+        const recentTranscript = this.transcript.getLastNText(10);
+        const lastNSpeakers = this.transcript
+            .getLast(5)
+            .map((e) => e.speaker);
+
+        // 2. Select agent (small model, recent context only)
+        const selection = await this.selector.select(
+            recentTranscript,
+            lastNSpeakers
+        );
 
         console.log(
             `[SELECTOR] Chose ${selection.selectedAgent}: ${selection.reasoning}`
         );
 
-        // 2. Get agent instance
+        // 3. Get agent instance
         const agent =
             this.agents.get(selection.selectedAgent) ??
             this.agents.values().next().value!;
 
-        // 3. Build context for response
+        // 4. Build context for response
         const recentMessages = this.transcript.getLastNText(5);
         const transcriptSummary = this.buildTranscriptSummary();
+        const conversationMeta = this.buildConversationMetadata();
+        const lastSpeaker =
+            this.transcript.getLast(1)[0]?.speaker || "unknown";
 
-        // 4. Generate response (large model)
-        const response = await agent.respond(recentMessages, transcriptSummary);
+        // 5. Generate response (large model)
+        const response = await agent.respond(
+            recentMessages,
+            transcriptSummary,
+            conversationMeta,
+            lastSpeaker
+        );
 
         // Record agent response in transcript
         this.transcript.add(response.agent, response.response);
@@ -93,6 +109,34 @@ export class MultiAgentSystem {
 
     getConfig(): MeetingConfig {
         return this.config;
+    }
+
+    private buildConversationMetadata(): string {
+        const entries = this.transcript.getAll();
+        const recentEntries = entries.slice(-10);
+
+        // Track speaking frequency
+        const speakerCounts = new Map<string, number>();
+        recentEntries.forEach((e) => {
+            speakerCounts.set(e.speaker, (speakerCounts.get(e.speaker) || 0) + 1);
+        });
+
+        // Identify current topic (last human speaker)
+        const lastHumanEntry = [...entries]
+            .reverse()
+            .find((e) => this.config.humans.some((h) => h.name === e.speaker));
+
+        // Get last speaker
+        const lastSpeaker = entries[entries.length - 1]?.speaker || "unknown";
+
+        return `[CONVERSATION STATE]
+Recent speakers: ${Array.from(speakerCounts.entries())
+                .map(([name, count]) => `${name} (${count})`)
+                .join(", ")}
+Last speaker: ${lastSpeaker}${lastHumanEntry
+                ? `\nLast human question/input from: ${lastHumanEntry.speaker}`
+                : ""
+            }`;
     }
 
     private buildTranscriptSummary(): string {
