@@ -94,7 +94,6 @@ export async function hybridSearch(
     size: k,
     query,
     knn,
-    rank: { rrf: {} },
   });
 
   const hits = response.hits.hits;

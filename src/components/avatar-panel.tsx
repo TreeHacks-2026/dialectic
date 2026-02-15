@@ -8,10 +8,6 @@ import {
   useRef,
   useState,
 } from "react";
-import StreamingAvatar, {
-  AvatarQuality,
-  StreamingEvents,
-} from "@heygen/streaming-avatar";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
@@ -29,7 +25,8 @@ const AvatarPanel = forwardRef<AvatarPanelHandle, AvatarPanelProps>(
   function AvatarPanel({ onReady }, ref) {
     const [status, setStatus] = useState<AvatarStatus>("idle");
     const [errorMessage, setErrorMessage] = useState("");
-    const avatarRef = useRef<StreamingAvatar | null>(null);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const avatarRef = useRef<any>(null);
     const videoRef = useRef<HTMLVideoElement>(null);
 
     useImperativeHandle(ref, () => ({
@@ -55,13 +52,23 @@ const AvatarPanel = forwardRef<AvatarPanelHandle, AvatarPanelProps>(
         }
         const { access_token } = await res.json();
 
+        const mod = await import("@heygen/streaming-avatar");
+        const StreamingAvatar = mod.default;
+        const { AvatarQuality, StreamingEvents } = mod;
+
         const avatar = new StreamingAvatar({ token: access_token });
         avatarRef.current = avatar;
 
         avatar.on(StreamingEvents.STREAM_READY, (event: unknown) => {
+          console.log("[AvatarPanel] STREAM_READY fired", event);
           const detail = (event as CustomEvent)?.detail;
-          if (detail && videoRef.current) {
-            videoRef.current.srcObject = detail as MediaStream;
+          const stream: MediaStream | null =
+            (detail instanceof MediaStream ? detail : null) ??
+            (avatar as unknown as { mediaStream: MediaStream | null }).mediaStream;
+
+          console.log("[AvatarPanel] resolved stream:", stream);
+          if (stream && videoRef.current) {
+            videoRef.current.srcObject = stream;
             videoRef.current.onloadedmetadata = () => {
               videoRef.current?.play().catch(console.error);
             };

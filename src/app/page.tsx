@@ -15,47 +15,37 @@ export default function Home() {
         <p className="text-xl text-muted-foreground max-w-lg">
           AI Teaching Assistant with Avatar Office Hours
         </p>
-        <p className="text-sm text-muted-foreground max-w-md mx-auto">
-          Upload your course materials, then learn through conversation with an
-          AI tutor backed by RAG-powered retrieval and a lifelike streaming
-          avatar.
-        </p>
       </div>
 
-      <div className="grid gap-6 sm:grid-cols-2 max-w-2xl w-full">
+      <div className="grid gap-6 sm:grid-cols-2 max-w-3xl w-full">
         <Link href="/tutor" className="block">
           <Card className="h-full hover:shadow-lg transition-shadow cursor-pointer border-2 hover:border-primary/40">
             <CardHeader>
-              <CardTitle className="text-lg">AI Tutor</CardTitle>
+              <CardTitle className="text-lg">HeyGen Avatar</CardTitle>
               <CardDescription>
-                Ask questions and get answers from your course materials through
-                an interactive avatar powered by HeyGen.
+                Type text and have the HeyGen streaming avatar speak it back to
+                you in real-time.
               </CardDescription>
             </CardHeader>
           </Card>
         </Link>
 
-        <Link href="/upload" className="block">
+        <Link href="/test" className="block">
           <Card className="h-full hover:shadow-lg transition-shadow cursor-pointer border-2 hover:border-primary/40">
             <CardHeader>
-              <CardTitle className="text-lg">Upload Materials</CardTitle>
+              <CardTitle className="text-lg">API Testing</CardTitle>
               <CardDescription>
-                Upload PDFs, text files, and Markdown to build your course
-                knowledge base with Elasticsearch and JINA embeddings.
+                Test Elasticsearch connection, document ingestion, hybrid search,
+                and course listing APIs.
               </CardDescription>
             </CardHeader>
           </Card>
         </Link>
       </div>
 
-      <div className="flex gap-4">
-        <Button asChild size="lg">
-          <Link href="/tutor">Start Learning</Link>
-        </Button>
-        <Button variant="outline" asChild size="lg">
-          <Link href="/upload">Manage Courses</Link>
-        </Button>
-      </div>
+      <Button asChild size="lg">
+        <Link href="/tutor">Start Avatar</Link>
+      </Button>
     </main>
   );
 }

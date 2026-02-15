@@ -7,65 +7,38 @@ import AvatarPanel, {
 } from "@/components/avatar-panel";
 import ChatPanel, { type ChatMessage } from "@/components/chat-panel";
 import ChatInput from "@/components/chat-input";
-import CourseSelector from "@/components/course-selector";
 import { Separator } from "@/components/ui/separator";
 
 export default function TutorPage() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [selectedCourse, setSelectedCourse] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const avatarPanelRef = useRef<AvatarPanelHandle>(null);
 
   const handleSend = useCallback(
-    async (question: string) => {
-      const userMsg: ChatMessage = { role: "user", content: question };
+    async (text: string) => {
+      const userMsg: ChatMessage = { role: "user", content: text };
       setMessages((prev) => [...prev, userMsg]);
       setIsLoading(true);
 
       try {
-        const chatHistory = messages.map((m) => ({
-          role: m.role,
-          content: m.content,
-        }));
-
-        const res = await fetch("/api/chat", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            question,
-            course_name: selectedCourse || undefined,
-            chat_history: chatHistory,
-          }),
-        });
-
-        if (!res.ok) {
-          throw new Error("Failed to get response");
-        }
-
-        const data = await res.json();
+        await avatarPanelRef.current?.speak(text);
         const assistantMsg: ChatMessage = {
           role: "assistant",
-          content: data.answer,
-          sources: data.sources,
+          content: `(Avatar spoke): "${text}"`,
         };
-
         setMessages((prev) => [...prev, assistantMsg]);
-
-        // Make the avatar speak the response (fire-and-forget)
-        avatarPanelRef.current?.speak(data.answer).catch(console.error);
       } catch (err) {
-        console.error("Chat error:", err);
+        console.error("Avatar speak error:", err);
         const errorMsg: ChatMessage = {
           role: "assistant",
-          content:
-            "Sorry, I encountered an error processing your question. Please try again.",
+          content: "Avatar is not connected. Click 'Start Avatar' first.",
         };
         setMessages((prev) => [...prev, errorMsg]);
       } finally {
         setIsLoading(false);
       }
     },
-    [messages, selectedCourse]
+    []
   );
 
   return (
@@ -78,10 +51,11 @@ export default function TutorPage() {
         >
           Dialectic
         </Link>
-        <CourseSelector
-          selectedCourse={selectedCourse}
-          onSelect={setSelectedCourse}
-        />
+        <div className="flex gap-2">
+          <Link href="/test" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+            API Testing
+          </Link>
+        </div>
       </header>
 
       {/* Main content */}
