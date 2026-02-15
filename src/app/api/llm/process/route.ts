@@ -82,7 +82,7 @@ function getMultiAgentSystemForSession(
   const meetingConfig: MeetingConfig = {
     agents: agentConfigsForSystem,
     humans: [], // Can be populated from meeting participants if needed
-    claude: { selectionModel: "claude-3-5-haiku-20241022" },
+    claude: { selectionModel: "claude-4-5-haiku-20241022" },
     perplexity: { responseModel: "sonar-pro" },
   };
 
@@ -187,6 +187,10 @@ export async function POST(request: NextRequest) {
     if (agentIdMap) {
       // Use session-specific mapping
       agentId = agentIdMap.get(agentResponse.agent) || agentResponse.agent;
+      console.log(`[LLM] 🔄 Mapped agent name "${agentResponse.agent}" to ID "${agentId}" (session-specific)`);
+      if (!agentIdMap.has(agentResponse.agent)) {
+        console.warn(`[LLM] ⚠️ Agent name "${agentResponse.agent}" not found in session agentIdMap. Available: ${Array.from(agentIdMap.keys()).join(', ')}`);
+      }
     } else {
       // Fallback: map agent names to default agent IDs from default-agents.ts
       const defaultAgentNameToId: Record<string, string> = {
@@ -195,7 +199,10 @@ export async function POST(request: NextRequest) {
         'Alex Young': 'young-passionate-lawyer',
       };
       agentId = defaultAgentNameToId[agentResponse.agent] || agentResponse.agent;
-      console.log(`[LLM] 🔄 Mapped agent name "${agentResponse.agent}" to ID "${agentId}"`);
+      console.log(`[LLM] 🔄 Mapped agent name "${agentResponse.agent}" to ID "${agentId}" (default mapping)`);
+      if (!defaultAgentNameToId[agentResponse.agent]) {
+        console.warn(`[LLM] ⚠️ Agent name "${agentResponse.agent}" not found in default mapping. Using name as ID.`);
+      }
     }
 
     const response: LLMProcessResponse = {

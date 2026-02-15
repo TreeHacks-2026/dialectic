@@ -72,11 +72,15 @@ export default function TutorPage() {
 
         // Route messages to correct avatar panels using agent IDs
         for (const msg of messages) {
+          console.log(`[Tutor] 📨 Routing message to agent ID: "${msg.agentId}"`);
+          console.log(`[Tutor] 📋 Available agent IDs in refs: ${Array.from(agentRefsMap.current.keys()).join(', ')}`);
           const ref = agentRefsMap.current.get(msg.agentId);
           if (ref?.current) {
+            console.log(`[Tutor] ✅ Found ref for agent ID "${msg.agentId}", speaking: "${msg.text.substring(0, 50)}..."`);
             ref.current.speak(msg.text);
           } else {
-            console.warn(`[Tutor] No ref found for agent ID: ${msg.agentId}`);
+            console.error(`[Tutor] ❌ No ref found for agent ID: "${msg.agentId}"`);
+            console.error(`[Tutor] 🔍 Config agents: ${config?.agents.map(a => `${a.name} (${a.id})`).join(', ')}`);
           }
         }
       } catch (err) {
