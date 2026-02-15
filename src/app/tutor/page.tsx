@@ -48,6 +48,11 @@ export default function TutorPage() {
   const [polling, setPolling] = useState(false);
   const logEndRef = useRef<HTMLDivElement>(null);
 
+  const anySpeaking = useMemo(
+    () => Object.values(speakingAgents).some(Boolean),
+    [speakingAgents]
+  );
+
   // Auto-scroll the log
   useEffect(() => {
     logEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -156,13 +161,16 @@ export default function TutorPage() {
     return agent?.label ?? agentId;
   };
 
-  // Responsive grid columns based on total items (agents + add button)
-  const totalItems = agents.length + (agents.length < MAX_AGENTS ? 1 : 0);
+  // Responsive grid columns based on visible (non-popped) items
+  const visibleInGrid = agents.filter((a) => !poppedAgents[a.id]).length;
+  const totalSlots = visibleInGrid + (agents.length < MAX_AGENTS ? 1 : 0);
+
   const gridColsClass = useMemo(() => {
-    if (totalItems <= 1) return "grid-cols-1 max-w-md mx-auto";
-    if (totalItems <= 2) return "grid-cols-1 md:grid-cols-2 max-w-3xl mx-auto";
+    if (totalSlots <= 1) return "grid-cols-1 max-w-md mx-auto";
+    if (totalSlots <= 2) return "grid-cols-1 md:grid-cols-2 max-w-3xl mx-auto";
+    if (totalSlots <= 4) return "grid-cols-1 md:grid-cols-2 max-w-4xl mx-auto";
     return "grid-cols-1 md:grid-cols-2 lg:grid-cols-3";
-  }, [totalItems]);
+  }, [totalSlots]);
 
   return (
     <div className="flex flex-col h-screen font-[family-name:var(--font-geist-sans)] bg-gradient-to-br from-slate-50 via-white to-blue-50/30 text-slate-900 overflow-hidden">
@@ -214,45 +222,81 @@ export default function TutorPage() {
         className={cn("relative z-10 grid gap-4 p-5", gridColsClass)}
       >
         <AnimatePresence mode="popLayout">
-          {agents.map((agent) => (
-            <motion.div
-              key={agent.id}
-              layout
-              initial={{ opacity: 0, scale: 0.85, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.85, y: -10 }}
-              transition={{ type: "spring", stiffness: 350, damping: 30 }}
-            >
-              <PopoutContainer
-                label={agent.label}
-                isPopped={!!poppedAgents[agent.id]}
-                onTogglePopout={() => togglePopout(agent.id)}
-                onRestore={() => restoreAgent(agent.id)}
-                colorAccent={BADGE_PALETTE[agent.colorIndex % BADGE_PALETTE.length].accent}
-                isSpeaking={!!speakingAgents[agent.id]}
-                onRequestPiP={() => handleRequestPiP(agent.id)}
+          {agents.map((agent) => {
+            const isFocused = !!speakingAgents[agent.id];
+            const isDimmed = anySpeaking && !isFocused && !poppedAgents[agent.id];
+
+            return (
+              <motion.div
+                key={agent.id}
+                layout
+                initial={{ opacity: 0, scale: 0.85, y: 20 }}
+                animate={{
+                  opacity: isDimmed ? 0.5 : 1,
+                  scale: isFocused ? 1.04 : isDimmed ? 0.96 : 1,
+                  y: 0,
+                  zIndex: isFocused ? 10 : 1,
+                }}
+                exit={{ opacity: 0, scale: 0.85, y: -10 }}
+                transition={{ type: "spring", stiffness: 350, damping: 30 }}
+                className={cn(
+                  "relative",
+                  isFocused && "z-10"
+                )}
               >
-                <AvatarPanel
-                  ref={(handle) => {
-                    if (handle) agentRefsMap.current.set(agent.id, handle);
-                    else agentRefsMap.current.delete(agent.id);
-                  }}
-                  id={agent.id}
+                <AnimatePresence>
+                  {isFocused && !poppedAgents[agent.id] && (
+                    <motion.div
+                      key="speaking-indicator"
+                      initial={{ opacity: 0, y: 5 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 5 }}
+                      transition={{ duration: 0.2 }}
+                      className="flex items-center gap-1.5 mb-2"
+                    >
+                      <span className="relative flex h-2.5 w-2.5">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75" />
+                        <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-blue-500" />
+                      </span>
+                      <span className="text-xs font-medium text-blue-600">Speaking...</span>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+                <PopoutContainer
                   label={agent.label}
+                  isPopped={!!poppedAgents[agent.id]}
+                  onTogglePopout={() => togglePopout(agent.id)}
+                  onRestore={() => restoreAgent(agent.id)}
                   colorAccent={BADGE_PALETTE[agent.colorIndex % BADGE_PALETTE.length].accent}
-                  onRemove={() => removeAgent(agent.id)}
-                  onRequestPopout={() => togglePopout(agent.id)}
-                  isPoppedOut={!!poppedAgents[agent.id]}
-                  onSpeakingChange={(speaking) => handleSpeakingChange(agent.id, speaking)}
-                />
-              </PopoutContainer>
-            </motion.div>
-          ))}
+                  isSpeaking={!!speakingAgents[agent.id]}
+                  onRequestPiP={() => handleRequestPiP(agent.id)}
+                >
+                  <AvatarPanel
+                    ref={(handle) => {
+                      if (handle) agentRefsMap.current.set(agent.id, handle);
+                      else agentRefsMap.current.delete(agent.id);
+                    }}
+                    id={agent.id}
+                    label={agent.label}
+                    colorAccent={BADGE_PALETTE[agent.colorIndex % BADGE_PALETTE.length].accent}
+                    onRemove={() => removeAgent(agent.id)}
+                    onRequestPopout={() => togglePopout(agent.id)}
+                    isPoppedOut={!!poppedAgents[agent.id]}
+                    onSpeakingChange={(speaking) => handleSpeakingChange(agent.id, speaking)}
+                  />
+                </PopoutContainer>
+              </motion.div>
+            );
+          })}
         </AnimatePresence>
 
         {agents.length < MAX_AGENTS && (
           <motion.div
             layout
+            animate={{
+              opacity: anySpeaking ? 0.4 : 1,
+              scale: anySpeaking ? 0.96 : 1,
+            }}
             transition={{ type: "spring", stiffness: 350, damping: 30 }}
           >
             <AddAgentCard
@@ -283,27 +327,33 @@ export default function TutorPage() {
                 </p>
               )}
 
-              {log.map((msg, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  className="flex items-start gap-2.5 py-1"
-                >
-                  <span
+              {log.map((msg, i) => {
+                const isActiveSpeaker = !!speakingAgents[msg.agent];
+                return (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
                     className={cn(
-                      "shrink-0 mt-0.5 px-2.5 py-0.5 text-xs font-medium rounded-full border",
-                      getAgentBadgeClass(msg.agent)
+                      "flex items-start gap-2.5 py-1.5 px-2 rounded-lg transition-colors duration-300",
+                      isActiveSpeaker && "bg-blue-50/60"
                     )}
                   >
-                    {getAgentLabel(msg.agent)}
-                  </span>
-                  <div className="text-sm">
-                    <span className="font-medium text-slate-700">{msg.speaker}:</span>{" "}
-                    <span className="text-slate-500">{msg.text}</span>
-                  </div>
-                </motion.div>
-              ))}
+                    <span
+                      className={cn(
+                        "shrink-0 mt-0.5 px-2.5 py-0.5 text-xs font-medium rounded-full border",
+                        getAgentBadgeClass(msg.agent)
+                      )}
+                    >
+                      {getAgentLabel(msg.agent)}
+                    </span>
+                    <div className="text-sm">
+                      <span className="font-medium text-slate-700">{msg.speaker}:</span>{" "}
+                      <span className="text-slate-500">{msg.text}</span>
+                    </div>
+                  </motion.div>
+                );
+              })}
 
               <div ref={logEndRef} />
             </div>
