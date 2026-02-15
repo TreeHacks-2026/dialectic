@@ -43,7 +43,6 @@ export class RTMSClientWrapper extends EventEmitter {
    */
   initialize(config: RTMSConfig): void {
     this.rtmsConfig = config;
-    console.log('[RTMS] Client initialized with credentials');
   }
 
   /**
@@ -87,11 +86,9 @@ export class RTMSClientWrapper extends EventEmitter {
     rtmsStreamId: string,
     signalingSocket: WebSocket
   ): void {
-    console.log(`[RTMS] Connecting to media WebSocket: ${mediaUrl}`);
     const mediaWs = new WebSocket(mediaUrl);
 
     mediaWs.on('open', () => {
-      console.log('[RTMS] Media WebSocket connected');
       const handshakeMsg = {
         msg_type: 3, // DATA_HAND_SHAKE_REQ
         protocol_version: 1,
@@ -113,7 +110,6 @@ export class RTMSClientWrapper extends EventEmitter {
         
         // Handle media handshake response
         if (msg.msg_type === 4 && msg.status_code === 0) {
-          console.log('[RTMS] ✅ Media handshake successful, sending CLIENT_READY_ACK');
           signalingSocket.send(JSON.stringify({
             msg_type: 7, // CLIENT_READY_ACK
             rtms_stream_id: rtmsStreamId
@@ -126,10 +122,7 @@ export class RTMSClientWrapper extends EventEmitter {
           const speakerName = msg.content?.user_name || 'Unknown';
           const timestamp = msg.timestamp || Date.now();
 
-          // Print to terminal (exact implementation)
-          console.log(`\n💬 [${speakerName}]: ${transcriptText}\n`);
-
-          // Emit transcript event
+          // Emit transcript event (no terminal output - just send to server)
           const transcriptEvent: TranscriptEvent = {
             session_id: rtmsStreamId,
             speaker_id: msg.content?.user_id || 'unknown',
@@ -160,10 +153,7 @@ export class RTMSClientWrapper extends EventEmitter {
       this.emit('error', error);
     });
 
-    mediaWs.on('close', (code, reason) => {
-      if (code !== 1000) {
-        console.log(`[RTMS] Media WebSocket closed: ${code} ${reason}`);
-      }
+    mediaWs.on('close', () => {
       this.mediaWs = null;
     });
 
@@ -183,11 +173,9 @@ export class RTMSClientWrapper extends EventEmitter {
       return;
     }
 
-    console.log(`[RTMS] Connecting to signaling WebSocket for meeting ${meetingUuid}`);
     const signalingWs = new WebSocket(serverUrls.signaling);
 
     signalingWs.on('open', () => {
-      console.log(`[RTMS] Signaling WebSocket opened for meeting ${meetingUuid}`);
 
       const signature = this.generateSignature(meetingUuid, rtmsStreamId);
 
@@ -210,7 +198,6 @@ export class RTMSClientWrapper extends EventEmitter {
         
         // Handle signaling handshake response
         if (msg.msg_type === 2 && msg.status_code === 0) {
-          console.log('[RTMS] ✅ Signaling handshake successful');
           const transcriptUrl = msg.media_server?.server_urls?.transcript;
           if (transcriptUrl) {
             this.connectToMediaWebSocket(transcriptUrl, meetingUuid, rtmsStreamId, signalingWs);
@@ -237,10 +224,7 @@ export class RTMSClientWrapper extends EventEmitter {
       this.emit('error', error);
     });
 
-    signalingWs.on('close', (code, reason) => {
-      if (code !== 1000) {
-        console.log(`[RTMS] Signaling WebSocket closed: ${code} ${reason}`);
-      }
+    signalingWs.on('close', () => {
       this.signalingWs = null;
     });
 
@@ -254,15 +238,9 @@ export class RTMSClientWrapper extends EventEmitter {
     const event = webhookData.event;
     const payload = webhookData.payload;
 
-    // Only log RTMS-related events
-    if (event === 'meeting.rtms_started' || event === 'meeting.rtms_stopped') {
-      console.log(`[RTMS] 🔍 Processing webhook event: ${event}`);
-    }
-
     // Handle RTMS stopped
     if (event === 'meeting.rtms_stopped') {
       const meetingUuid = payload.meeting_uuid as string | undefined;
-      console.log(`[RTMS] Stopping RTMS for meeting ${meetingUuid}`);
 
       // Close connections
       if (this.mediaWs) {
@@ -278,7 +256,6 @@ export class RTMSClientWrapper extends EventEmitter {
       this.currentMeetingUuid = null;
 
       this.emit('disconnected', this.currentStreamId);
-      console.log(`[RTMS] Disconnected from stream`);
 
       // Notify frontend
       const stoppedStreamId = this.currentStreamId;
@@ -319,8 +296,6 @@ export class RTMSClientWrapper extends EventEmitter {
     // Handle server_urls as either string or object (Zoom sends it as string)
     let serverUrls: { signaling?: string; [key: string]: unknown };
     if (typeof serverUrlsRaw === 'string') {
-      // If it's a string, use it directly as the signaling URL
-      console.log('[RTMS] server_urls is a string, using as signaling URL:', serverUrlsRaw);
       serverUrls = { signaling: serverUrlsRaw };
     } else if (serverUrlsRaw && typeof serverUrlsRaw === 'object') {
       serverUrls = serverUrlsRaw;
@@ -329,8 +304,6 @@ export class RTMSClientWrapper extends EventEmitter {
       return;
     }
 
-    console.log(`[RTMS] Starting RTMS for meeting ${meetingUuid}, stream ${rtmsStreamId}`);
-
     this.currentStreamId = rtmsStreamId;
     this.currentMeetingUuid = meetingUuid;
 
@@ -338,7 +311,6 @@ export class RTMSClientWrapper extends EventEmitter {
     this.connectToSignalingWebSocket(meetingUuid, rtmsStreamId, serverUrls);
 
     this.emit('connected', rtmsStreamId);
-    console.log(`[RTMS] ✅ Joining meeting with stream ID: ${rtmsStreamId}`);
 
     // Notify frontend
     if (this.connectionStatusCallback) {
@@ -366,7 +338,6 @@ export class RTMSClientWrapper extends EventEmitter {
       this.currentStreamId = null;
       this.currentMeetingUuid = null;
     }
-    console.log(`[RTMS] Disconnected from stream: ${streamId}`);
   }
 
   /**
