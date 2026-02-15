@@ -1,17 +1,17 @@
 /**
- * Agent selector — uses Gemini Flash (free) to decide which agent should respond
+ * Agent selector — uses Claude to decide which agent should respond
  */
 
 import { AgentConfig, AgentSelectionResult } from "../types/types";
-import { GeminiClient } from "./gemini-client";
+import { ClaudeClient } from "./claude-client";
 
 export class AgentSelector {
-    private client: GeminiClient;
+    private client: ClaudeClient;
     private model: string;
     private agents: AgentConfig[];
 
     constructor(
-        client: GeminiClient,
+        client: ClaudeClient,
         model: string,
         agents: AgentConfig[]
     ) {
