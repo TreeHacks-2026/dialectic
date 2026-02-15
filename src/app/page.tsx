@@ -2,13 +2,20 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search, ChevronDown, User, Sparkles, Eye, Filter, Target } from "lucide-react";
+import { DotPattern, GridPattern, AnimatedBeams, BackgroundGradientAnimation } from "@/components/ui/animated-background";
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[hsl(250,40%,94%)] via-[hsl(260,45%,92%)] to-[hsl(240,50%,95%)]">
+    <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-[hsl(250,40%,94%)] via-[hsl(260,45%,92%)] to-[hsl(240,50%,95%)]">
+      {/* Animated Background Layers */}
+      <BackgroundGradientAnimation className="absolute inset-0">
+        <DotPattern className="text-purple-400/40" />
+        <GridPattern className="text-blue-400/30" strokeDasharray="4 2" />
+        <AnimatedBeams />
+      </BackgroundGradientAnimation>
       {/* Header */}
-      <header className="mx-auto max-w-7xl px-6 py-6">
-        <div className="flex items-center justify-between rounded-3xl bg-white px-8 py-4 shadow-sm">
+      <header className="relative z-10 mx-auto max-w-7xl px-6 py-6">
+        <div className="flex items-center justify-between rounded-3xl bg-white/90 px-8 py-4 shadow-sm backdrop-blur-sm">
           <div className="flex items-center gap-12">
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-purple-400 via-pink-300 to-blue-300">
@@ -53,7 +60,7 @@ export default function Home() {
       </header>
 
       {/* Hero Section */}
-      <main className="mx-auto max-w-7xl px-6 py-12">
+      <main className="relative z-10 mx-auto max-w-7xl px-6 py-12">
         <div className="relative">
           <div className="flex flex-col gap-12 lg:flex-row lg:items-center lg:justify-between">
             {/* Left Content */}
@@ -80,7 +87,7 @@ export default function Home() {
             {/* Right Content - Floating Cards */}
             <div className="relative flex items-center justify-center lg:w-1/2">
               {/* Profile Card */}
-              <div className="absolute right-0 top-0 z-10 rounded-2xl bg-white p-6 shadow-lg">
+              <div className="absolute right-0 top-0 z-10 rounded-2xl bg-white/95 p-6 shadow-lg backdrop-blur-sm">
                 <div className="flex flex-col items-center gap-3">
                   <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-blue-400 to-blue-500">
                     <User className="h-8 w-8 text-white" />
@@ -96,7 +103,7 @@ export default function Home() {
               </div>
 
               {/* Job Search Card */}
-              <div className="mt-20 rounded-2xl bg-white p-6 shadow-xl lg:w-96">
+              <div className="mt-20 rounded-2xl bg-white/95 p-6 shadow-xl backdrop-blur-sm lg:w-96">
                 <div className="space-y-4">
                   <div className="space-y-2">
                     <label className="text-sm font-medium">Find Job</label>
@@ -146,7 +153,7 @@ export default function Home() {
           </div>
 
           {/* Feature Cards */}
-          <div className="mt-24 rounded-3xl bg-white p-8 shadow-sm">
+          <div className="mt-24 rounded-3xl bg-white/90 p-8 shadow-sm backdrop-blur-sm">
             <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
               <div className="flex flex-col items-center gap-4 text-center">
                 <div className="flex h-16 w-16 items-center justify-center rounded-full bg-blue-100">
