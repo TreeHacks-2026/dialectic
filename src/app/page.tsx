@@ -54,7 +54,16 @@ export default function Home() {
           className="flex items-center justify-between rounded-2xl border border-white/40 bg-white/60 px-6 py-4 shadow-[0_8px_32px_rgba(0,0,0,0.08)] backdrop-blur-2xl"
         >
           <div className="flex items-center gap-12">
-            <h1 className="text-2xl font-bold tracking-tight text-blue-600">RNT</h1>
+            <Link href="/" className="flex items-center">
+              <div className="relative h-10 w-10 overflow-hidden rounded-xl">
+                <Image
+                  src="/dialectic-logo.jpg"
+                  alt="Dialectic"
+                  fill
+                  className="object-cover"
+                />
+              </div>
+            </Link>
             
             <nav className="hidden items-center gap-8 lg:flex">
               <Link href="#" className="text-sm font-medium text-foreground/80 hover:text-blue-600">
@@ -297,7 +306,7 @@ export default function Home() {
             </Link>
           </div>
           <div className="text-sm text-muted-foreground">
-            @ 2026 RNT. All rights reserved.
+            @ 2026 Dialectic. All rights reserved.
           </div>
         </div>
       </footer>
