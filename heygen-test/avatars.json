@@ -1,0 +1,500 @@
+{
+  "Santa Fireplace Front": {
+    "id": "1c690fe7-23e0-49f9-bfba-14344450285b",
+    "voice_id": "bcc6960c-b2d3-41e9-a8a5-2780ce6abe2e",
+    "voice_name": "Santa - Public",
+    "preview_url": "https://files2.heygen.ai/avatar/v3/3b4e464bf15f4194b082be0e631354c6_46860/preview_target.webp"
+  },
+  "Ann Therapist": {
+    "id": "513fd1b7-7ef9-466d-9af2-344e51eeb833",
+    "voice_id": "de5574fc-009e-4a01-a881-9919ef8f5a0c",
+    "voice_name": "Ann - IA",
+    "preview_url": "https://files2.heygen.ai/avatar/v3/75e0a87b7fd94f0981ff398b593dd47f_45570/preview_talk_4.webp"
+  },
+  "Ann Doctor Standing": {
+    "id": "567e8371-f69f-49ec-9f2d-054083431165",
+    "voice_id": "de5574fc-009e-4a01-a881-9919ef8f5a0c",
+    "voice_name": "Ann - IA",
+    "preview_url": "https://files2.heygen.ai/avatar/v3/699a4c2995914d39b2cb311a930d7720_45570/preview_talk_3.webp"
+  },
+  "Ann Doctor Sitting": {
+    "id": "fc9c1f9f-bc99-4fd9-a6b2-8b4b5669a046",
+    "voice_id": "de5574fc-009e-4a01-a881-9919ef8f5a0c",
+    "voice_name": "Ann - IA",
+    "preview_url": "https://files2.heygen.ai/avatar/v3/26de369b2d4443e586dedf27af1e0c1d_45570/preview_talk_1.webp"
+  },
+  "Shawn Therapist": {
+    "id": "7b888024-f8c9-4205-95e1-78ce01497bda",
+    "voice_id": "51afbab6-7af4-473b-95fc-6ce26aac8bb1",
+    "voice_name": "Shawn - IA",
+    "preview_url": "https://files2.heygen.ai/avatar/v3/db2fb7fd0d044b908395a011166ab22d_45680/preview_target.webp"
+  },
+  "Dexter Lawyer": {
+    "id": "0930fd59-c8ad-434d-ad53-b391a1768720",
+    "voice_id": "b952f553-f7f3-4e52-8625-86b4c415384f",
+    "voice_name": "Dexter - Professional",
+    "preview_url": "https://files2.heygen.ai/avatar/v3/e20ac0c902184ff793e75ae4e139b7dc_45600/preview_target.webp"
+  },
+  "Dexter Doctor Sitting": {
+    "id": "bd43ce31-7425-4379-8407-60f029548e61",
+    "voice_id": "b952f553-f7f3-4e52-8625-86b4c415384f",
+    "voice_name": "Dexter - Professional",
+    "preview_url": "https://files2.heygen.ai/avatar/v3/f83fffc45faa4368b6db9597e6b323ca_45590/preview_talk_3.webp"
+  },
+  "Dexter Doctor Standing": {
+    "id": "5761a14c-8720-4ce1-8c2b-3f351718fc79",
+    "voice_id": "b952f553-f7f3-4e52-8625-86b4c415384f",
+    "voice_name": "Dexter - Professional",
+    "preview_url": "https://files2.heygen.ai/avatar/v3/88d421f939044bb08d892e833931948b_45590/preview_talk_1.webp"
+  },
+  "Judy Doctor Standing": {
+    "id": "0f563214-1cb5-4dc0-a2f9-43f44e5e6b57",
+    "voice_id": "4f3b1e99-b580-4f05-9b67-a5f585be0232",
+    "voice_name": "Judy - Professional",
+    "preview_url": "https://files2.heygen.ai/avatar/v3/13bc0ed39627493da8404a4beb373f3a_45650/preview_talk_3.webp"
+  },
+  "Judy Doctor Sitting": {
+    "id": "07faa1c4-b7e1-4d26-a38a-337364dee160",
+    "voice_id": "4f3b1e99-b580-4f05-9b67-a5f585be0232",
+    "voice_name": "Judy - Professional",
+    "preview_url": "https://files2.heygen.ai/avatar/v3/022cdb1f07914e75887c693f0c5f97dd_45650/preview_talk_1.webp"
+  },
+  "Judy Lawyer": {
+    "id": "6e32f90a-f566-45be-9ec7-a5f6999ee606",
+    "voice_id": "4f3b1e99-b580-4f05-9b67-a5f585be0232",
+    "voice_name": "Judy - Professional",
+    "preview_url": "https://files2.heygen.ai/avatar/v3/a7c86cb77b3144948bf8020f6e734bbf_45640/preview_talk_1.webp"
+  },
+  "Judy Teacher Standing": {
+    "id": "b6c94c07-e4e5-483e-8bec-e838d5910b7d",
+    "voice_id": "4f3b1e99-b580-4f05-9b67-a5f585be0232",
+    "voice_name": "Judy - Professional",
+    "preview_url": "https://files2.heygen.ai/avatar/v3/6cd7031aa97e496897391dd44dae56be_45630/preview_talk_1.webp"
+  },
+  "Judy Teacher Sitting": {
+    "id": "c72a9099-84b9-4d5d-98f4-a19ba131e654",
+    "voice_id": "4f3b1e99-b580-4f05-9b67-a5f585be0232",
+    "voice_name": "Judy - Professional",
+    "preview_url": "https://files2.heygen.ai/avatar/v3/f94ae3e89f4c4ff98541ab59efa5878b_45630/preview_talk_2.webp"
+  },
+  "Judy HR": {
+    "id": "cd1d101c-9273-431b-8069-63beef736bec",
+    "voice_id": "4f3b1e99-b580-4f05-9b67-a5f585be0232",
+    "voice_name": "Judy - Professional",
+    "preview_url": "https://files2.heygen.ai/avatar/v3/68fbd9f64a4948baa3c295d35f49b61c_45630/preview_target.webp"
+  },
+  "June HR": {
+    "id": "65f9e3c9-d48b-4118-b73a-4ae2e3cbb8f0",
+    "voice_id": "62bbb4b2-bb26-4727-bc87-cfb2bd4e0cc8",
+    "voice_name": "June - Lifelike",
+    "preview_url": "https://files2.heygen.ai/avatar/v3/74447a27859a456c955e01f21ef18216_45620/preview_talk_1.webp"
+  },
+  "Silas HR": {
+    "id": "9650a758-1085-4d49-8bf3-f347565ec229",
+    "voice_id": "b139a8fe-7240-4454-ac37-8c68aebcee41",
+    "voice_name": "Silas - Lifelike",
+    "preview_url": "https://files2.heygen.ai/avatar/v3/582ee8fe072a48fda3bc68241aeff660_45660/preview_target.webp"
+  },
+  "Silas Customer Support": {
+    "id": "dc2935cf-5863-4f08-943b-c7478aea59fb",
+    "voice_id": "b139a8fe-7240-4454-ac37-8c68aebcee41",
+    "voice_name": "Silas - Lifelike",
+    "preview_url": "https://files2.heygen.ai/avatar/v3/a1ed8c71e4bf4e6cb9071d2b7cd71e4e_45660/preview_talk_1.webp"
+  },
+  "Bryan Tech Expert": {
+    "id": "64b526e4-741c-43b6-a918-4e40f3261c7a",
+    "voice_id": "9c8b542a-bf5c-4f4c-9011-75c79a274387",
+    "voice_name": "Bryan - Professional",
+    "preview_url": "https://files2.heygen.ai/avatar/v3/33c9ac4aead44dfc8bc0082a35062a70_45580/preview_talk_3.webp"
+  },
+  "Bryan Fitness Coach": {
+    "id": "55eec60c-d665-4972-a529-bbdcaf665ab8",
+    "voice_id": "9c8b542a-bf5c-4f4c-9011-75c79a274387",
+    "voice_name": "Bryan - Professional",
+    "preview_url": "https://files2.heygen.ai/avatar/v3/7fbef4dd1d6641bc8777b26a6aaac85e_45580/preview_talk_1.webp"
+  },
+  "Elenora Tech Expert": {
+    "id": "8175dfc2-7858-49d6-b5fa-0c135d1c4bad",
+    "voice_id": "254ffe1e-c89f-430f-8c36-9e7611d310c0",
+    "voice_name": "Elenora - Professional",
+    "preview_url": "https://files2.heygen.ai/avatar/v3/cbd4a69890a040e6a0d54088e606a559_45610/preview_talk_3.webp"
+  },
+  "Elenora Fitness Coach 2": {
+    "id": "7299c55d-1f45-482d-915c-e5efdc9dd266",
+    "voice_id": "254ffe1e-c89f-430f-8c36-9e7611d310c0",
+    "voice_name": "Elenora - Professional",
+    "preview_url": "https://files2.heygen.ai/avatar/v3/e097a0182d5e4f5a8dabc656fd39c063_45610/preview_target.webp"
+  },
+  "Elenora Fitness Coach": {
+    "id": "9a4f4b1f-86f9-4acf-9a37-b81c21ae95e4",
+    "voice_id": "254ffe1e-c89f-430f-8c36-9e7611d310c0",
+    "voice_name": "Elenora - Professional",
+    "preview_url": "https://files2.heygen.ai/avatar/v3/4e5afdfe8bdb44f3ae18b90281ab034c_45610/preview_talk_1.webp"
+  },
+  "Wayne": {
+    "id": "dd73ea75-1218-4ef3-92ce-606d5f7fbc0a",
+    "voice_id": "c2527536-6d1f-4412-a643-53a3497dada9",
+    "voice_name": "Wayne Liang",
+    "preview_url": "https://files2.heygen.ai/avatar/v3/a3fdb0c652024f79984aaec11ebf2694_34350/preview_target.webp"
+  },
+  "Katya Sitting": {
+    "id": "073b60a9-89a8-45aa-8902-c358f64d2852",
+    "voice_id": "864a26b8-bfba-4435-9cc5-1dd593de5ca7",
+    "voice_name": "Katya - IA",
+    "preview_url": "https://files2.heygen.ai/avatar/v3/b1ff5edbf96242e6ac9469227df40924_55360/preview_target.webp"
+  },
+  "Katya in Black Suit": {
+    "id": "26393b8e-e944-4367-98ef-e2bc75c4b792",
+    "voice_id": "864a26b8-bfba-4435-9cc5-1dd593de5ca7",
+    "voice_name": "Katya - IA",
+    "preview_url": "https://files2.heygen.ai/avatar/v3/da5cba6bc7b34c5ea139f77da98fdc04_55370/preview_talk_1.webp"
+  },
+  "Katya in Pink Suit": {
+    "id": "09919247-f4b2-45d8-a75e-86fc2fceaebf",
+    "voice_id": "864a26b8-bfba-4435-9cc5-1dd593de5ca7",
+    "voice_name": "Katya - IA",
+    "preview_url": "https://files2.heygen.ai/avatar/v3/5d50a54d2787496bb16a1176aecc0f53_55370/preview_target.webp"
+  },
+  "Katya Sitting (Portrait)": {
+    "id": "65cca4cf-b7c8-4619-871f-84e2cf8b21d4",
+    "voice_id": "864a26b8-bfba-4435-9cc5-1dd593de5ca7",
+    "voice_name": "Katya - IA",
+    "preview_url": "https://files2.heygen.ai/avatar/v3/5b1db7e2080f4106a85b987437430a24_55860/preview_target.webp"
+  },
+  "Katya in Black Suit (Portrait)": {
+    "id": "260d706a-bf31-48fd-96d0-511553a9060e",
+    "voice_id": "864a26b8-bfba-4435-9cc5-1dd593de5ca7",
+    "voice_name": "Katya - IA",
+    "preview_url": "https://files2.heygen.ai/avatar/v3/d52ffa1b447d4f2f8eb16917e7ec222a_55870/preview_talk_1.webp"
+  },
+  "Katya in Pink Suit (Portrait)": {
+    "id": "69cf601f-b35b-4d1b-a701-c854d223b5a5",
+    "voice_id": "864a26b8-bfba-4435-9cc5-1dd593de5ca7",
+    "voice_name": "Katya - IA",
+    "preview_url": "https://files2.heygen.ai/avatar/v3/348ddf503c654b9bbbb8bea9f9210ead_55870/preview_target.webp"
+  },
+  "Graham Sitting": {
+    "id": "e9844e6d-847e-4964-a92b-7ecd066f69df",
+    "voice_id": "e04e9d57-853f-4d72-a8ff-8e3c768f4c9c",
+    "voice_name": "Graham - IA",
+    "preview_url": "https://files2.heygen.ai/avatar/v3/2146e2c8c07045c0b3598683d4473fdd_55340/preview_target.webp"
+  },
+  "Graham in Black Suit": {
+    "id": "03f8332d-9046-42a1-bff3-3b2309f77b58",
+    "voice_id": "e04e9d57-853f-4d72-a8ff-8e3c768f4c9c",
+    "voice_name": "Graham - IA",
+    "preview_url": "https://files2.heygen.ai/avatar/v3/e04ebabcc6784cb6959a866605474650_55350/preview_talk_1.webp"
+  },
+  "Graham in Black Shirt": {
+    "id": "bb1f6ebc-b388-4a39-9e2b-8df618e0377c",
+    "voice_id": "e04e9d57-853f-4d72-a8ff-8e3c768f4c9c",
+    "voice_name": "Graham - IA",
+    "preview_url": "https://files2.heygen.ai/avatar/v3/1bd0162ce985415092ed1f003aa90646_55350/preview_target.webp"
+  },
+  "Graham Sitting (Portrait)": {
+    "id": "a173664e-ac0a-472d-9812-10e77968b7e8",
+    "voice_id": "e04e9d57-853f-4d72-a8ff-8e3c768f4c9c",
+    "voice_name": "Graham - IA",
+    "preview_url": "https://files2.heygen.ai/avatar/v3/932757021c4845c3b31832d433f2ee09_55840/preview_target.webp"
+  },
+  "Graham in Black Suit (Portrait)": {
+    "id": "fc4125a5-83fa-45e2-8574-bf657ac19998",
+    "voice_id": "e04e9d57-853f-4d72-a8ff-8e3c768f4c9c",
+    "voice_name": "Graham - IA",
+    "preview_url": "https://files2.heygen.ai/avatar/v3/ff50f874d821400cbaefde9ff92b6a73_55850/preview_talk_1.webp"
+  },
+  "Graham in Black Shirt (Portrait)": {
+    "id": "f0a9978d-634a-4063-8164-42ba6670542f",
+    "voice_id": "e04e9d57-853f-4d72-a8ff-8e3c768f4c9c",
+    "voice_name": "Graham - IA",
+    "preview_url": "https://files2.heygen.ai/avatar/v3/648d965d97b9409f901b3d6196276fb5_55850/preview_target.webp"
+  },
+  "Amina Sitting": {
+    "id": "40b4f000-f783-4bba-a327-ea58b1a6fdf2",
+    "voice_id": "e948b062-7dce-4f2b-bcf6-98bd3511106b",
+    "voice_name": "Amina - IA",
+    "preview_url": "https://files2.heygen.ai/avatar/v3/59cde571f56d4952bac9564da7d3ccc3_55260/preview_target.webp"
+  },
+  "Amina in Black Suit": {
+    "id": "42700a53-38ab-4485-b46f-26be6e0953dc",
+    "voice_id": "e948b062-7dce-4f2b-bcf6-98bd3511106b",
+    "voice_name": "Amina - IA",
+    "preview_url": "https://files2.heygen.ai/avatar/v3/d457fb0050a046a683058666fa3b2252_55270/preview_talk_1.webp"
+  },
+  "Amina in Blue Suit": {
+    "id": "bfed3e3e-7d44-4fdb-b2be-ce9a9fd0b9b5",
+    "voice_id": "e948b062-7dce-4f2b-bcf6-98bd3511106b",
+    "voice_name": "Amina - IA",
+    "preview_url": "https://files2.heygen.ai/avatar/v3/04fe00b09f6248b9808812a2d1cba23a_55270/preview_target.webp"
+  },
+  "Amina Sitting (Portrait)": {
+    "id": "17b77ba3-5251-45c6-8477-62ed13265420",
+    "voice_id": "e948b062-7dce-4f2b-bcf6-98bd3511106b",
+    "voice_name": "Amina - IA",
+    "preview_url": "https://files2.heygen.ai/avatar/v3/93fad1758b264feb94ed8133344846de_55760/preview_target.webp"
+  },
+  "Amina in Black Suit (Portrait)": {
+    "id": "06bcaebf-feeb-4e7a-8ab8-16b9f9537a19",
+    "voice_id": "e948b062-7dce-4f2b-bcf6-98bd3511106b",
+    "voice_name": "Amina - IA",
+    "preview_url": "https://files2.heygen.ai/avatar/v3/6705b79f647a4699b91f722b26424fc9_55770/preview_talk_1.webp"
+  },
+  "Amina in Blue Suit (Portrait)": {
+    "id": "334c4101-4c2d-4aa4-9c4e-342867842608",
+    "voice_id": "e948b062-7dce-4f2b-bcf6-98bd3511106b",
+    "voice_name": "Amina - IA",
+    "preview_url": "https://files2.heygen.ai/avatar/v3/1befda9feaba4d4ca22dc6cfda0e65c2_55770/preview_target.webp"
+  },
+  "Anthony Sitting": {
+    "id": "91342979-4c4c-44f1-bd3b-1c846d20341e",
+    "voice_id": "c466083f-30f0-465b-a836-0b77abfe7956",
+    "voice_name": "Anthony - IA",
+    "preview_url": "https://files2.heygen.ai/avatar/v3/3dc3449bfaaf4109adb8ea3eaad06053_55320/preview_target.webp"
+  },
+  "Anthony in Black Suit": {
+    "id": "38ad67ed-98f0-407c-a2d2-4f0998b306fc",
+    "voice_id": "c466083f-30f0-465b-a836-0b77abfe7956",
+    "voice_name": "Anthony - IA",
+    "preview_url": "https://files2.heygen.ai/avatar/v3/c08ed6510bce4d45ada3ef491d6a08c1_55330/preview_talk_1.webp"
+  },
+  "Anthony in White Suit": {
+    "id": "509609b9-cda3-4f74-b1b2-97b4d98834fd",
+    "voice_id": "c466083f-30f0-465b-a836-0b77abfe7956",
+    "voice_name": "Anthony - IA",
+    "preview_url": "https://files2.heygen.ai/avatar/v3/428c336f47ad479f986514fe6436bfd4_55330/preview_target.webp"
+  },
+  "Anthony Sitting (Portrait)": {
+    "id": "064703ad-91f4-4e50-866d-e251d0762c9f",
+    "voice_id": "c466083f-30f0-465b-a836-0b77abfe7956",
+    "voice_name": "Anthony - IA",
+    "preview_url": "https://files2.heygen.ai/avatar/v3/1c66d2b30a154adcabe0fb92beebda19_55820/preview_target.webp"
+  },
+  "Anthony in Black Suit (Portrait)": {
+    "id": "3466af9c-45f5-40f2-8392-c51f8385422c",
+    "voice_id": "c466083f-30f0-465b-a836-0b77abfe7956",
+    "voice_name": "Anthony - IA",
+    "preview_url": "https://files2.heygen.ai/avatar/v3/2d05e851d27f49b0b784f0872c360d63_55830/preview_talk_1.webp"
+  },
+  "Anthony in White Suit (Portrait)": {
+    "id": "b26c00a5-8861-4fd3-90cc-144791d2d81d",
+    "voice_id": "c466083f-30f0-465b-a836-0b77abfe7956",
+    "voice_name": "Anthony - IA",
+    "preview_url": "https://files2.heygen.ai/avatar/v3/c76c972055dd4206b82fc3b3c973cb88_55830/preview_target.webp"
+  },
+  "Rika Sitting": {
+    "id": "5dd4d830-957a-419f-9334-0dc4399ada5d",
+    "voice_id": "b2bd6569-a537-4342-aeca-a1f15d2a2c97",
+    "voice_name": "Rika - IA",
+    "preview_url": "https://files2.heygen.ai/avatar/v3/2b901b6b72c4444d81a93a2eb8fe1070_55420/preview_target.webp"
+  },
+  "Rika in Blue Suit": {
+    "id": "0aae6046-0ab9-44fe-a08d-c5ac3f406d34",
+    "voice_id": "b2bd6569-a537-4342-aeca-a1f15d2a2c97",
+    "voice_name": "Rika - IA",
+    "preview_url": "https://files2.heygen.ai/avatar/v3/e9a6933e10f94273a72a484d99ff5618_55430/preview_talk_1.webp"
+  },
+  "Rika in Black Suit": {
+    "id": "075abc67-2fae-4548-8ca9-b815fcbd34c7",
+    "voice_id": "b2bd6569-a537-4342-aeca-a1f15d2a2c97",
+    "voice_name": "Rika - IA",
+    "preview_url": "https://files2.heygen.ai/avatar/v3/6170f31327e2465095f0121c65a7cb1b_55430/preview_target.webp"
+  },
+  "Rika Sitting (Portrait)": {
+    "id": "37c384cc-e572-4bf1-bc2a-02907ffc6521",
+    "voice_id": "b2bd6569-a537-4342-aeca-a1f15d2a2c97",
+    "voice_name": "Rika - IA",
+    "preview_url": "https://files2.heygen.ai/avatar/v3/edfe155a51294088bcf97a55d8b46d70_55920/preview_target.webp"
+  },
+  "Rika in Blue Suit (Portrait)": {
+    "id": "5c6e2257-bb91-48f4-a75d-d4c9ad212af9",
+    "voice_id": "b2bd6569-a537-4342-aeca-a1f15d2a2c97",
+    "voice_name": "Rika - IA",
+    "preview_url": "https://files2.heygen.ai/avatar/v3/1548e58a43a94e899b926be080cc1bad_55930/preview_talk_1.webp"
+  },
+  "Rika in Black Suit (Portrait)": {
+    "id": "de16689a-234a-4334-b504-3b379d30daa1",
+    "voice_id": "b2bd6569-a537-4342-aeca-a1f15d2a2c97",
+    "voice_name": "Rika - IA",
+    "preview_url": "https://files2.heygen.ai/avatar/v3/02f0809d0617439786400f7b843d0b9e_55930/preview_target.webp"
+  },
+  "Pedro Sitting": {
+    "id": "7a517e8e-b41f-49e7-b6b3-2cdfb4bbff1e",
+    "voice_id": "98a984cd-5f25-49b1-8844-2195c3d50e0f",
+    "voice_name": "Pedro - IA",
+    "preview_url": "https://files2.heygen.ai/avatar/v3/92de79e533a8421bb86da63a0e5eb12f_57010/preview_target.webp"
+  },
+  "Pedro in Black Suit": {
+    "id": "200eba85-74c0-4210-8670-81ceab4efd0d",
+    "voice_id": "98a984cd-5f25-49b1-8844-2195c3d50e0f",
+    "voice_name": "Pedro - IA",
+    "preview_url": "https://files2.heygen.ai/avatar/v3/1273ddd881eb4114a792e56c8ebe8998_55410/preview_talk_1.webp"
+  },
+  "Pedro in Blue Shirt": {
+    "id": "7001c332-8101-4e5a-b695-eac2a72d9568",
+    "voice_id": "98a984cd-5f25-49b1-8844-2195c3d50e0f",
+    "voice_name": "Pedro - IA",
+    "preview_url": "https://files2.heygen.ai/avatar/v3/2a658e2358c24bf299c40701a82f40c2_55410/preview_target.webp"
+  },
+  "Pedro Sitting (Portrait)": {
+    "id": "5e826887-4aa4-4479-9a9d-d9810263975f",
+    "voice_id": "98a984cd-5f25-49b1-8844-2195c3d50e0f",
+    "voice_name": "Pedro - IA",
+    "preview_url": "https://files2.heygen.ai/avatar/v3/4ca7eb7442f74fe0bbcc205f3fe6f271_55900/preview_target.webp"
+  },
+  "Pedro in Black Suit (Portrait)": {
+    "id": "90a94dae-8df2-4b12-99a8-5bbc34c9551e",
+    "voice_id": "98a984cd-5f25-49b1-8844-2195c3d50e0f",
+    "voice_name": "Pedro - IA",
+    "preview_url": "https://files2.heygen.ai/avatar/v3/f9c94ae7bd1545e8b6531a91ba976ad9_55910/preview_talk_1.webp"
+  },
+  "Pedro in Blue Shirt (Portrait)": {
+    "id": "9a5a4cb2-a32e-415f-8689-aa9d61acee1b",
+    "voice_id": "98a984cd-5f25-49b1-8844-2195c3d50e0f",
+    "voice_name": "Pedro - IA",
+    "preview_url": "https://files2.heygen.ai/avatar/v3/45f7de4da32248ef952a8db325aee258_55910/preview_target.webp"
+  },
+  "Alessandra Sitting": {
+    "id": "998e5637-cfca-4700-891e-8a40ce33f562",
+    "voice_id": "c84af063-5ce2-4370-8ef8-dcd0ef903d43",
+    "voice_name": "Alessandra - IA",
+    "preview_url": "https://files2.heygen.ai/avatar/v3/89e07b826f1c4cb1a5549201cdd8f4d6_55300/preview_target.webp"
+  },
+  "Alessandra in Black Suit": {
+    "id": "9c59a215-4c9f-478f-9d95-edca74c7b0d0",
+    "voice_id": "c84af063-5ce2-4370-8ef8-dcd0ef903d43",
+    "voice_name": "Alessandra - IA",
+    "preview_url": "https://files2.heygen.ai/avatar/v3/ef3893cf0bf84411851d1f360a36462e_55310/preview_target.webp"
+  },
+  "Alessandra in Grey Sweater": {
+    "id": "ab0765ad-69de-41fb-9f8a-bd01c3c52d6f",
+    "voice_id": "c84af063-5ce2-4370-8ef8-dcd0ef903d43",
+    "voice_name": "Alessandra - IA",
+    "preview_url": "https://files2.heygen.ai/avatar/v3/dce2de72df964375a25af29e461fb734_55310/preview_talk_1.webp"
+  },
+  "Alessandra Sitting (Portrait)": {
+    "id": "ed07b532-56f7-4701-a53f-657a8503e22a",
+    "voice_id": "c84af063-5ce2-4370-8ef8-dcd0ef903d43",
+    "voice_name": "Alessandra - IA",
+    "preview_url": "https://files2.heygen.ai/avatar/v3/2702eff6add14b699eb6e4202ef9136e_55800/preview_target.webp"
+  },
+  "Alessandra in Black Suit (Portrait)": {
+    "id": "de82b2cc-7314-40a1-b41f-cc456c66601c",
+    "voice_id": "c84af063-5ce2-4370-8ef8-dcd0ef903d43",
+    "voice_name": "Alessandra - IA",
+    "preview_url": "https://files2.heygen.ai/avatar/v3/0d03b7be19ad472fac4144cd0d2e808d_55810/preview_target.webp"
+  },
+  "Alessandra in Grey Sweater (Portrait)": {
+    "id": "63014563-22f7-4401-95db-034f3c992ec3",
+    "voice_id": "c84af063-5ce2-4370-8ef8-dcd0ef903d43",
+    "voice_name": "Alessandra - IA",
+    "preview_url": "https://files2.heygen.ai/avatar/v3/92f863c1db2d48cbb34e803866881192_55810/preview_talk_1.webp"
+  },
+  "Anastasia Sitting": {
+    "id": "3f291b22-0267-4fb6-a25b-847fb63604b0",
+    "voice_id": "3607df3c-9de0-4274-b0be-7e035775ead5",
+    "voice_name": "Anastasia - IA",
+    "preview_url": "https://files2.heygen.ai/avatar/v3/d3370d0f86784bde8e2144d16d573dcc_55280/preview_target.webp"
+  },
+  "Anastasia in Black Suit": {
+    "id": "ebdfdc7e-7e2c-4d2c-8407-a78883e5000a",
+    "voice_id": "3607df3c-9de0-4274-b0be-7e035775ead5",
+    "voice_name": "Anastasia - IA",
+    "preview_url": "https://files2.heygen.ai/avatar/v3/c0fb0437a2b64fc991e68923af50e172_55290/preview_talk_1.webp"
+  },
+  "Anastasia in Grey Shirt": {
+    "id": "b4fc2d60-3b82-4694-b243-93e9d2bb0242",
+    "voice_id": "3607df3c-9de0-4274-b0be-7e035775ead5",
+    "voice_name": "Anastasia - IA",
+    "preview_url": "https://files2.heygen.ai/avatar/v3/9849a1cbe96f46b0a3bb5be895237124_55290/preview_target.webp"
+  },
+  "Anastasia Sitting (Portrait)": {
+    "id": "b475a5c1-c6a9-45d1-9f86-79b97cf0091f",
+    "voice_id": "3607df3c-9de0-4274-b0be-7e035775ead5",
+    "voice_name": "Anastasia - IA",
+    "preview_url": "https://files2.heygen.ai/avatar/v3/590135b2e0154e4aa8f4f9aafcc83165_55780/preview_target.webp"
+  },
+  "Anastasia in Black Suit (Portrait)": {
+    "id": "649e4023-7e82-4a01-af90-4476d75df75d",
+    "voice_id": "3607df3c-9de0-4274-b0be-7e035775ead5",
+    "voice_name": "Anastasia - IA",
+    "preview_url": "https://files2.heygen.ai/avatar/v3/fe78bf59639d4eb2ade0cde74cee984b_55790/preview_talk_1.webp"
+  },
+  "Anastasia in Grey Shirt (Portrait)": {
+    "id": "65ee9a5b-00ae-4c96-acf2-3326d9566467",
+    "voice_id": "3607df3c-9de0-4274-b0be-7e035775ead5",
+    "voice_name": "Anastasia - IA",
+    "preview_url": "https://files2.heygen.ai/avatar/v3/6428cf3872094995af8f40696ddd6ef3_55790/preview_target.webp"
+  },
+  "Thaddeus Sitting": {
+    "id": "d1b25f7e-ef00-455b-af2f-62c84254924a",
+    "voice_id": "83a26e3f-bcff-4887-80a2-17531c342c9e",
+    "voice_name": "Thaddeus - IA",
+    "preview_url": "https://files2.heygen.ai/avatar/v3/5af8a33c88d044ecb7f29c244d879e97_55440/preview_target.webp"
+  },
+  "Thaddeus in Black Suit": {
+    "id": "246e8d9d-5826-4f49-b8a0-07cb73ff7556",
+    "voice_id": "83a26e3f-bcff-4887-80a2-17531c342c9e",
+    "voice_name": "Thaddeus - IA",
+    "preview_url": "https://files2.heygen.ai/avatar/v3/a1a6a9c57e2b4eab920a683e66b3e921_55450/preview_target.webp"
+  },
+  "Thaddeus in Black Shirt": {
+    "id": "16141106-96b5-4dd9-9846-593728c5d0ed",
+    "voice_id": "83a26e3f-bcff-4887-80a2-17531c342c9e",
+    "voice_name": "Thaddeus - IA",
+    "preview_url": "https://files2.heygen.ai/avatar/v3/624978e3fa2c4d989d92f272e6cc9a79_55450/preview_talk_1.webp"
+  },
+  "Thaddeus Sitting (Portrait)": {
+    "id": "5ace7983-e6b9-4801-ab05-ac68dd37b168",
+    "voice_id": "83a26e3f-bcff-4887-80a2-17531c342c9e",
+    "voice_name": "Thaddeus - IA",
+    "preview_url": "https://files2.heygen.ai/avatar/v3/4e5e3454ef204785a271634566840edc_55940/preview_target.webp"
+  },
+  "Thaddeus in Black Suit (Portrait)": {
+    "id": "6a1906e3-6caa-4aba-995f-c49088661560",
+    "voice_id": "83a26e3f-bcff-4887-80a2-17531c342c9e",
+    "voice_name": "Thaddeus - IA",
+    "preview_url": "https://files2.heygen.ai/avatar/v3/8dc2caa172cd4e6796b37e9f16954b7e_55950/preview_target.webp"
+  },
+  "Thaddeus in Black Shirt (Portrait)": {
+    "id": "37521110-f8cf-4c34-b37e-bbb4f670711e",
+    "voice_id": "83a26e3f-bcff-4887-80a2-17531c342c9e",
+    "voice_name": "Thaddeus - IA",
+    "preview_url": "https://files2.heygen.ai/avatar/v3/c0b5b8aecefb41e2bb2589ba58bee1ab_55950/preview_talk_1.webp"
+  },
+  "Marianne Sitting": {
+    "id": "bf00036b-558a-44b5-b2ff-1e3cec0f4ceb",
+    "voice_id": "8a504f9b-95dd-42d4-8b0c-edc2567b6382",
+    "voice_name": "Marianne - IA",
+    "preview_url": "https://files2.heygen.ai/avatar/v3/3d606d7659854541a0dd9ee3a81528ec_55380/preview_target.webp"
+  },
+  "Marianne in Black Suit": {
+    "id": "f86e8b45-3389-424a-b3d7-7f6e8729e36d",
+    "voice_id": "8a504f9b-95dd-42d4-8b0c-edc2567b6382",
+    "voice_name": "Marianne - IA",
+    "preview_url": "https://files2.heygen.ai/avatar/v3/d5fc5662d26f49cf919979dc3acc2a72_55390/preview_talk_1.webp"
+  },
+  "Marianne in Red Suit": {
+    "id": "8532b602-89e8-44fa-a9e2-5a4259a058cc",
+    "voice_id": "8a504f9b-95dd-42d4-8b0c-edc2567b6382",
+    "voice_name": "Marianne - IA",
+    "preview_url": "https://files2.heygen.ai/avatar/v3/4cb21e9e145f47be831e568cf1d8cea2_55390/preview_target.webp"
+  },
+  "Marianne Sitting (Portrait)": {
+    "id": "19955cd3-3612-4899-9467-554867c9d461",
+    "voice_id": "8a504f9b-95dd-42d4-8b0c-edc2567b6382",
+    "voice_name": "Marianne - IA",
+    "preview_url": "https://files2.heygen.ai/avatar/v3/06fbc51909234d0996e0a0599119ad34_55880/preview_target.webp"
+  },
+  "Marianne in Black Suit (Portrait)": {
+    "id": "f0953388-a391-4518-945b-f2db3b602e77",
+    "voice_id": "8a504f9b-95dd-42d4-8b0c-edc2567b6382",
+    "voice_name": "Marianne - IA",
+    "preview_url": "https://files2.heygen.ai/avatar/v3/2c3af0a2db924781a1dad7500778e218_55890/preview_talk_1.webp"
+  },
+  "Marianne in Red Suit (Portrait)": {
+    "id": "9d4d6cdd-38a1-448e-a336-1ac682ba6a27",
+    "voice_id": "8a504f9b-95dd-42d4-8b0c-edc2567b6382",
+    "voice_name": "Marianne - IA",
+    "preview_url": "https://files2.heygen.ai/avatar/v3/e32d7d1047a24c34a70c54c2b77441c0_55890/preview_target.webp"
+  }
+}
