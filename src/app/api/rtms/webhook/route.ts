@@ -116,15 +116,19 @@ function getRTMSClient(): RTMSClient {
  */
 export async function POST(request: NextRequest) {
   try {
+    console.log('[RTMS API] 📥 Webhook request received');
     const webhookData = await request.json();
-    console.log(`[RTMS API] 📥 Webhook: ${webhookData.event || 'unknown'}`);
+    console.log(`[RTMS API] 📥 Webhook event: ${webhookData.event || 'unknown'}`);
+    console.log(`[RTMS API] 📥 Webhook payload keys:`, Object.keys(webhookData.payload || {}));
 
     const client = getRTMSClient();
     client.handleWebhookEvent(webhookData);
 
+    console.log(`[RTMS API] ✅ Webhook processed successfully`);
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('[RTMS API] ❌ Error:', error);
+    console.error('[RTMS API] ❌ Error processing webhook:', error);
+    console.error('[RTMS API] ❌ Error stack:', error instanceof Error ? error.stack : 'No stack');
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
@@ -137,20 +141,28 @@ export async function POST(request: NextRequest) {
  */
 export async function GET() {
   try {
+    console.log('[RTMS API] 📊 Status check requested');
     const client = getRTMSClient();
     
-    return NextResponse.json({
+    const status = {
       status: 'ok',
       rtms_configured: true,
       rtms_connected: client.isConnected(),
       session_id: client.getCurrentSessionId(),
       transcripts_received: transcriptQueue.length,
       recent_transcripts: transcriptQueue.slice(-10), // Last 10 transcripts
-    });
+      webhook_url: process.env.NEXT_PUBLIC_APP_URL || 
+                   (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 
+                   process.env.RENDER_EXTERNAL_URL || 
+                   'http://localhost:3000') + '/api/rtms/webhook',
+    };
+    
+    console.log('[RTMS API] 📊 Status:', JSON.stringify(status, null, 2));
+    return NextResponse.json(status);
   } catch (error) {
     // Return 200 for health check even if RTMS isn't configured
     // This allows the service to be marked as healthy
-    return NextResponse.json({
+    const status = {
       status: 'ok',
       rtms_configured: false,
       rtms_connected: false,
@@ -158,6 +170,12 @@ export async function GET() {
       transcripts_received: transcriptQueue.length,
       recent_transcripts: [],
       message: error instanceof Error ? error.message : 'RTMS not configured',
-    });
+      webhook_url: process.env.NEXT_PUBLIC_APP_URL || 
+                   (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 
+                   process.env.RENDER_EXTERNAL_URL || 
+                   'http://localhost:3000') + '/api/rtms/webhook',
+    };
+    console.log('[RTMS API] 📊 Status (not configured):', JSON.stringify(status, null, 2));
+    return NextResponse.json(status);
   }
 }

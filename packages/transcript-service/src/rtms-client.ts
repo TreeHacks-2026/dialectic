@@ -271,8 +271,11 @@ export class RTMSClientWrapper extends EventEmitter {
 
     // Handle RTMS started - ignore non-RTMS events
     if (event !== 'meeting.rtms_started') {
+      console.log(`[RTMS] Ignoring non-RTMS event: ${event}`);
       return;
     }
+    
+    console.log(`[RTMS] 🔍 Processing meeting.rtms_started event`);
 
     // Check if credentials are initialized
     if (!this.rtmsConfig) {
@@ -307,10 +310,13 @@ export class RTMSClientWrapper extends EventEmitter {
     this.currentStreamId = rtmsStreamId;
     this.currentMeetingUuid = meetingUuid;
 
+    console.log(`[RTMS] 🔗 Connecting to RTMS for meeting ${meetingUuid}, stream ${rtmsStreamId}`);
+    
     // Connect to signaling WebSocket to establish RTMS connection
     this.connectToSignalingWebSocket(meetingUuid, rtmsStreamId, serverUrls);
 
     this.emit('connected', rtmsStreamId);
+    console.log(`[RTMS] ✅ Connection initiated`);
 
     // Notify frontend
     if (this.connectionStatusCallback) {
