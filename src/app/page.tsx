@@ -1,37 +1,43 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { ChevronDown, ArrowDownUp, Building2, Briefcase } from "lucide-react";
+import { ChevronDown, ArrowDownUp, Building2, Briefcase, User, Mic, Video, Share2 } from "lucide-react";
 
 export default function Home() {
   return (
-    <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-purple-50 via-pink-50 to-purple-100">
+    <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-blue-50 via-cyan-50 to-sky-100">
+      {/* Animated Blue Background */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -left-20 top-20 h-96 w-96 animate-blob rounded-full bg-blue-300/30 mix-blend-multiply blur-3xl filter" />
+        <div className="animation-delay-2000 absolute right-20 top-40 h-96 w-96 animate-blob rounded-full bg-cyan-300/30 mix-blend-multiply blur-3xl filter" />
+        <div className="animation-delay-4000 absolute bottom-20 left-1/3 h-96 w-96 animate-blob rounded-full bg-sky-300/30 mix-blend-multiply blur-3xl filter" />
+      </div>
       {/* Header */}
       <header className="relative z-10 mx-auto max-w-7xl px-6 py-8">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-12">
-            <h1 className="text-2xl font-bold tracking-tight text-foreground">RNT</h1>
+            <h1 className="text-2xl font-bold tracking-tight text-blue-600">RNT</h1>
             
             <nav className="hidden items-center gap-8 lg:flex">
-              <Link href="#" className="text-sm font-medium text-foreground/80 hover:text-foreground">
+              <Link href="#" className="text-sm font-medium text-foreground/80 hover:text-blue-600">
                 Features
               </Link>
-              <Link href="#" className="text-sm font-medium text-foreground/80 hover:text-foreground">
+              <Link href="#" className="text-sm font-medium text-foreground/80 hover:text-blue-600">
                 Private
               </Link>
-              <Link href="#" className="text-sm font-medium text-foreground/80 hover:text-foreground">
+              <Link href="#" className="text-sm font-medium text-foreground/80 hover:text-blue-600">
                 Blog
               </Link>
-              <Link href="#" className="text-sm font-medium text-foreground/80 hover:text-foreground">
+              <Link href="#" className="text-sm font-medium text-foreground/80 hover:text-blue-600">
                 About
               </Link>
             </nav>
           </div>
 
           <div className="flex items-center gap-4">
-            <Button variant="ghost" className="text-sm font-medium">
+            <Button variant="ghost" className="text-sm font-medium hover:text-blue-600">
               Contact
             </Button>
-            <Button className="rounded-full bg-black px-6 text-sm font-medium text-white hover:bg-black/90">
+            <Button className="rounded-full bg-blue-600 px-6 text-sm font-medium text-white hover:bg-blue-700">
               Get started
             </Button>
           </div>
@@ -41,60 +47,112 @@ export default function Home() {
       {/* Hero Section */}
       <main className="relative z-10 mx-auto max-w-7xl px-6 pb-12 pt-8">
         <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
-          {/* Left Side - Illustration */}
+          {/* Left Side - Zoom Meeting Interface */}
           <div className="relative flex items-center justify-center">
-            {/* Curved Wave Shape */}
-            <svg
-              viewBox="0 0 600 600"
-              className="h-full w-full max-w-2xl"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <defs>
-                <linearGradient id="waveGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#e9d5ff" />
-                  <stop offset="50%" stopColor="#f3e8ff" />
-                  <stop offset="100%" stopColor="#fce7f3" />
-                </linearGradient>
-                <filter id="shadow">
-                  <feDropShadow dx="0" dy="10" stdDeviation="20" floodOpacity="0.2" />
-                </filter>
-              </defs>
-              
-              {/* Wave Path */}
-              <path
-                d="M 50 300 Q 150 100, 300 200 Q 450 300, 550 250 L 550 600 Q 300 500, 50 600 Z"
-                fill="url(#waveGradient)"
-                filter="url(#shadow)"
-              />
-              
-              {/* Portfolio Icons */}
-              <g transform="translate(200, 150)">
-                <circle cx="0" cy="0" r="40" fill="#e0e7ff" opacity="0.9" />
-                <foreignObject x="-20" y="-20" width="40" height="40">
-                  <div className="flex h-full w-full items-center justify-center">
-                    <Building2 className="h-6 w-6 text-indigo-600" />
+            <div className="w-full max-w-xl space-y-4">
+              {/* Zoom Meeting Container with Glassmorphism */}
+              <div className="relative overflow-hidden rounded-3xl border border-white/40 bg-white/20 p-6 shadow-2xl backdrop-blur-xl">
+                {/* Meeting Grid - 2x2 */}
+                <div className="grid grid-cols-2 gap-3">
+                  {/* Participant 1 */}
+                  <div className="group relative aspect-video overflow-hidden rounded-xl bg-gradient-to-br from-blue-400 to-blue-600">
+                    <div className="flex h-full items-center justify-center">
+                      <div className="flex h-20 w-20 items-center justify-center rounded-full bg-blue-700/50 backdrop-blur-sm">
+                        <User className="h-10 w-10 text-white" />
+                      </div>
+                    </div>
+                    <div className="absolute bottom-2 left-2 rounded-md bg-black/60 px-2 py-1 text-xs font-medium text-white backdrop-blur-sm">
+                      Sarah K.
+                    </div>
+                    <div className="absolute right-2 top-2 opacity-0 transition-opacity group-hover:opacity-100">
+                      <div className="flex gap-1">
+                        <button className="rounded-md bg-black/60 p-1.5 backdrop-blur-sm hover:bg-black/80">
+                          <Mic className="h-3 w-3 text-white" />
+                        </button>
+                      </div>
+                    </div>
                   </div>
-                </foreignObject>
-              </g>
-              
-              <g transform="translate(350, 250)">
-                <circle cx="0" cy="0" r="50" fill="#fef3c7" opacity="0.9" />
-                <foreignObject x="-25" y="-25" width="50" height="50">
-                  <div className="flex h-full w-full items-center justify-center">
-                    <Briefcase className="h-8 w-8 text-amber-600" />
+
+                  {/* Participant 2 */}
+                  <div className="group relative aspect-video overflow-hidden rounded-xl bg-gradient-to-br from-cyan-400 to-cyan-600">
+                    <div className="flex h-full items-center justify-center">
+                      <div className="flex h-20 w-20 items-center justify-center rounded-full bg-cyan-700/50 backdrop-blur-sm">
+                        <User className="h-10 w-10 text-white" />
+                      </div>
+                    </div>
+                    <div className="absolute bottom-2 left-2 rounded-md bg-black/60 px-2 py-1 text-xs font-medium text-white backdrop-blur-sm">
+                      Michael P.
+                    </div>
+                    <div className="absolute right-2 top-2 opacity-0 transition-opacity group-hover:opacity-100">
+                      <div className="flex gap-1">
+                        <button className="rounded-md bg-black/60 p-1.5 backdrop-blur-sm hover:bg-black/80">
+                          <Mic className="h-3 w-3 text-white" />
+                        </button>
+                      </div>
+                    </div>
                   </div>
-                </foreignObject>
-              </g>
-              
-              <g transform="translate(450, 180)">
-                <circle cx="0" cy="0" r="45" fill="#dbeafe" opacity="0.9" />
-                <foreignObject x="-22" y="-22" width="44" height="44">
-                  <div className="flex h-full w-full items-center justify-center">
-                    <Building2 className="h-7 w-7 text-blue-600" />
+
+                  {/* Participant 3 */}
+                  <div className="group relative aspect-video overflow-hidden rounded-xl bg-gradient-to-br from-sky-400 to-sky-600">
+                    <div className="flex h-full items-center justify-center">
+                      <div className="flex h-20 w-20 items-center justify-center rounded-full bg-sky-700/50 backdrop-blur-sm">
+                        <User className="h-10 w-10 text-white" />
+                      </div>
+                    </div>
+                    <div className="absolute bottom-2 left-2 rounded-md bg-black/60 px-2 py-1 text-xs font-medium text-white backdrop-blur-sm">
+                      Emma L.
+                    </div>
+                    <div className="absolute right-2 top-2 opacity-0 transition-opacity group-hover:opacity-100">
+                      <div className="flex gap-1">
+                        <button className="rounded-md bg-black/60 p-1.5 backdrop-blur-sm hover:bg-black/80">
+                          <Mic className="h-3 w-3 text-white" />
+                        </button>
+                      </div>
+                    </div>
                   </div>
-                </foreignObject>
-              </g>
-            </svg>
+
+                  {/* Participant 4 - Active Speaker with Border */}
+                  <div className="group relative aspect-video overflow-hidden rounded-xl border-2 border-blue-400 bg-gradient-to-br from-indigo-400 to-indigo-600">
+                    <div className="flex h-full items-center justify-center">
+                      <div className="flex h-20 w-20 items-center justify-center rounded-full bg-indigo-700/50 backdrop-blur-sm">
+                        <User className="h-10 w-10 text-white" />
+                      </div>
+                    </div>
+                    <div className="absolute bottom-2 left-2 rounded-md bg-black/60 px-2 py-1 text-xs font-medium text-white backdrop-blur-sm">
+                      Alex R. (You)
+                    </div>
+                    <div className="absolute right-2 top-2 opacity-0 transition-opacity group-hover:opacity-100">
+                      <div className="flex gap-1">
+                        <button className="rounded-md bg-black/60 p-1.5 backdrop-blur-sm hover:bg-black/80">
+                          <Mic className="h-3 w-3 text-white" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Meeting Controls Bar */}
+                <div className="mt-4 flex items-center justify-center gap-3">
+                  <button className="flex items-center gap-2 rounded-xl bg-white/30 px-4 py-2.5 backdrop-blur-md transition-all hover:bg-white/40">
+                    <Mic className="h-4 w-4 text-white" />
+                    <span className="text-xs font-medium text-white">Mute</span>
+                  </button>
+                  <button className="flex items-center gap-2 rounded-xl bg-white/30 px-4 py-2.5 backdrop-blur-md transition-all hover:bg-white/40">
+                    <Video className="h-4 w-4 text-white" />
+                    <span className="text-xs font-medium text-white">Video</span>
+                  </button>
+                  <button className="flex items-center gap-2 rounded-xl bg-white/30 px-4 py-2.5 backdrop-blur-md transition-all hover:bg-white/40">
+                    <Share2 className="h-4 w-4 text-white" />
+                    <span className="text-xs font-medium text-white">Share</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Floating Badge */}
+              <div className="mx-auto w-fit rounded-full border border-blue-200/40 bg-white/40 px-4 py-2 backdrop-blur-md">
+                <p className="text-sm font-medium text-blue-900">Connect with top designers remotely</p>
+              </div>
+            </div>
           </div>
 
           {/* Right Side - Exchange Interface */}
@@ -106,14 +164,14 @@ export default function Home() {
             </div>
 
             {/* Exchange Card */}
-            <div className="rounded-3xl bg-white p-8 shadow-xl">
+            <div className="rounded-3xl border border-white/40 bg-white/80 p-8 shadow-2xl backdrop-blur-xl">
               <div className="space-y-6">
                 {/* Tabs */}
                 <div className="flex gap-2">
-                  <button className="rounded-xl bg-muted px-6 py-2 text-sm font-semibold text-foreground">
+                  <button className="rounded-xl bg-blue-50 px-6 py-2 text-sm font-semibold text-blue-600">
                     Job Search
                   </button>
-                  <button className="rounded-xl px-6 py-2 text-sm font-medium text-muted-foreground hover:text-foreground">
+                  <button className="rounded-xl px-6 py-2 text-sm font-medium text-muted-foreground hover:text-blue-600">
                     Portfolio Match
                   </button>
                 </div>
@@ -173,7 +231,7 @@ export default function Home() {
                 </div>
 
                 {/* Exchange Button */}
-                <Button className="w-full rounded-2xl bg-black py-6 text-base font-semibold text-white hover:bg-black/90">
+                <Button className="w-full rounded-2xl bg-blue-600 py-6 text-base font-semibold text-white hover:bg-blue-700">
                   Search now
                 </Button>
               </div>
