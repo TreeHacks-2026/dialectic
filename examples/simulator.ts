@@ -47,12 +47,12 @@ async function main(): Promise<void> {
     const config = loadConfig(configPath);
 
     // Check for API keys
-    const geminiKey = process.env.GEMINI_API_KEY;
+    const claudeKey = process.env.CLAUDE_API_KEY;
     const perplexityKey = process.env.PERPLEXITY_API_KEY;
 
-    if (!geminiKey || geminiKey === "your-gemini-key-here") {
-        console.error("Error: Set GEMINI_API_KEY in .env file");
-        console.error("  Free key: https://aistudio.google.com/apikey");
+    if (!claudeKey || claudeKey === "your-claude-key-here") {
+        console.error("Error: Set CLAUDE_API_KEY in .env file");
+        console.error("  Get key: https://console.anthropic.com/");
         process.exit(1);
     }
     if (!perplexityKey || perplexityKey === "your-perplexity-key-here") {
@@ -62,7 +62,7 @@ async function main(): Promise<void> {
 
     // Initialize system
     const system = new MultiAgentSystem(config, {
-        gemini: geminiKey,
+        claude: claudeKey,
         perplexity: perplexityKey,
     });
 
