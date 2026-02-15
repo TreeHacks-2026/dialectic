@@ -1,0 +1,15 @@
+{
+  "name": "dialectic",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:transcript": "npm run dev --workspace=@dialectic/transcript-service",
+    "install:all": "npm install"
+  },
+  "dependencies": {
+    "dotenv": "^17.3.1"
+  }
+}
