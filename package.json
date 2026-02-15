@@ -1,0 +1,27 @@
+{
+  "name": "dialectic",
+  "version": "1.0.0",
+  "description": "Multi-agent input processing system",
+  "main": "src/index.ts",
+  "scripts": {
+    "dev": "ts-node examples/simulator.ts",
+    "build": "tsc",
+    "start": "node dist/examples/simulator.js"
+  },
+  "keywords": [
+    "multi-agent",
+    "ai",
+    "zoom",
+    "stt"
+  ],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
+  },
+  "dependencies": {
+    "dotenv": "^17.3.1"
+  }
+}
