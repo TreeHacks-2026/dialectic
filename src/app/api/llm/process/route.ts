@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { MultiAgentSystem, ApiKeys } from '@/core/multi-agent-system';
 import { MeetingConfig } from '@/types/types';
-import configData from '../../../config.json';
+import configData from '../../../../config.json';
 
 interface LLMProcessRequest {
   transcript: string;
