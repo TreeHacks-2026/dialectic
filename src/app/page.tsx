@@ -1,211 +1,206 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Search, ChevronDown, User, Sparkles, Eye, Filter, Target } from "lucide-react";
-import { DotPattern, GridPattern, AnimatedBeams, BackgroundGradientAnimation } from "@/components/ui/animated-background";
+import { ChevronDown, ArrowDownUp, Building2, Briefcase } from "lucide-react";
 
 export default function Home() {
   return (
-    <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-[hsl(250,40%,94%)] via-[hsl(260,45%,92%)] to-[hsl(240,50%,95%)]">
-      {/* Animated Background Layers */}
-      <BackgroundGradientAnimation className="absolute inset-0">
-        <DotPattern className="text-purple-400/40" />
-        <GridPattern className="text-blue-400/30" strokeDasharray="4 2" />
-        <AnimatedBeams />
-      </BackgroundGradientAnimation>
+    <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-purple-50 via-pink-50 to-purple-100">
       {/* Header */}
-      <header className="relative z-10 mx-auto max-w-7xl px-6 py-6">
-        <div className="flex items-center justify-between rounded-3xl bg-white/90 px-8 py-4 shadow-sm backdrop-blur-sm">
+      <header className="relative z-10 mx-auto max-w-7xl px-6 py-8">
+        <div className="flex items-center justify-between">
           <div className="flex items-center gap-12">
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-purple-400 via-pink-300 to-blue-300">
-                <div className="text-lg font-bold">RNT</div>
-              </div>
-            </div>
+            <h1 className="text-2xl font-bold tracking-tight text-foreground">RNT</h1>
             
             <nav className="hidden items-center gap-8 lg:flex">
-              <div className="relative">
-                <Input 
-                  placeholder="What Are You Looking For?" 
-                  className="w-64 border-0 bg-muted/50 pl-4 pr-4 focus-visible:ring-1"
-                />
-              </div>
-              <button className="flex items-center gap-1 text-sm font-medium hover:text-accent">
-                Jobs <ChevronDown className="h-4 w-4" />
-              </button>
-              <Link href="#" className="text-sm font-medium hover:text-accent">
-                Post A Job
+              <Link href="#" className="text-sm font-medium text-foreground/80 hover:text-foreground">
+                Features
               </Link>
-              <Link href="#" className="text-sm font-medium hover:text-accent">
-                Hire A Designer
+              <Link href="#" className="text-sm font-medium text-foreground/80 hover:text-foreground">
+                Private
               </Link>
-              <Link href="#" className="text-sm font-medium hover:text-accent">
-                Browse Portfolio
+              <Link href="#" className="text-sm font-medium text-foreground/80 hover:text-foreground">
+                Blog
               </Link>
-              <Link href="#" className="text-sm font-medium hover:text-accent">
-                Become A Designer
+              <Link href="#" className="text-sm font-medium text-foreground/80 hover:text-foreground">
+                About
               </Link>
             </nav>
           </div>
 
           <div className="flex items-center gap-4">
             <Button variant="ghost" className="text-sm font-medium">
-              Log In
+              Contact
             </Button>
-            <Button className="rounded-full bg-primary px-6 text-sm font-medium text-primary-foreground hover:bg-primary/90">
-              Sign Up
+            <Button className="rounded-full bg-black px-6 text-sm font-medium text-white hover:bg-black/90">
+              Get started
             </Button>
           </div>
         </div>
       </header>
 
       {/* Hero Section */}
-      <main className="relative z-10 mx-auto max-w-7xl px-6 py-12">
-        <div className="relative">
-          <div className="flex flex-col gap-12 lg:flex-row lg:items-center lg:justify-between">
-            {/* Left Content */}
-            <div className="max-w-xl space-y-8">
-              <div className="space-y-4">
-                <h1 className="text-balance text-6xl font-bold leading-tight tracking-tight text-foreground lg:text-7xl">
-                  Skill-Based Interior Design Hiring
-                </h1>
-                <p className="text-pretty text-lg leading-relaxed text-muted-foreground">
-                  A global job board where interior designers are hired based on their portfolio, not personal details.
-                </p>
-              </div>
-
-              <div className="flex items-center gap-4">
-                <Button size="lg" className="rounded-xl bg-primary px-8 text-base font-semibold text-primary-foreground hover:bg-primary/90">
-                  Search Jobs
-                </Button>
-                <Button size="lg" variant="outline" className="rounded-xl border-2 px-8 text-base font-semibold">
-                  Register Your Self
-                </Button>
-              </div>
-            </div>
-
-            {/* Right Content - Floating Cards */}
-            <div className="relative flex items-center justify-center lg:w-1/2">
-              {/* Profile Card */}
-              <div className="absolute right-0 top-0 z-10 rounded-2xl bg-white/95 p-6 shadow-lg backdrop-blur-sm">
-                <div className="flex flex-col items-center gap-3">
-                  <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-blue-400 to-blue-500">
-                    <User className="h-8 w-8 text-white" />
+      <main className="relative z-10 mx-auto max-w-7xl px-6 pb-12 pt-8">
+        <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
+          {/* Left Side - Illustration */}
+          <div className="relative flex items-center justify-center">
+            {/* Curved Wave Shape */}
+            <svg
+              viewBox="0 0 600 600"
+              className="h-full w-full max-w-2xl"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <defs>
+                <linearGradient id="waveGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#e9d5ff" />
+                  <stop offset="50%" stopColor="#f3e8ff" />
+                  <stop offset="100%" stopColor="#fce7f3" />
+                </linearGradient>
+                <filter id="shadow">
+                  <feDropShadow dx="0" dy="10" stdDeviation="20" floodOpacity="0.2" />
+                </filter>
+              </defs>
+              
+              {/* Wave Path */}
+              <path
+                d="M 50 300 Q 150 100, 300 200 Q 450 300, 550 250 L 550 600 Q 300 500, 50 600 Z"
+                fill="url(#waveGradient)"
+                filter="url(#shadow)"
+              />
+              
+              {/* Portfolio Icons */}
+              <g transform="translate(200, 150)">
+                <circle cx="0" cy="0" r="40" fill="#e0e7ff" opacity="0.9" />
+                <foreignObject x="-20" y="-20" width="40" height="40">
+                  <div className="flex h-full w-full items-center justify-center">
+                    <Building2 className="h-6 w-6 text-indigo-600" />
                   </div>
-                  <div className="text-center">
-                    <div className="text-sm font-bold">ID-L2342</div>
-                    <div className="text-xs text-muted-foreground">Interior Designer, Ex Co.</div>
+                </foreignObject>
+              </g>
+              
+              <g transform="translate(350, 250)">
+                <circle cx="0" cy="0" r="50" fill="#fef3c7" opacity="0.9" />
+                <foreignObject x="-25" y="-25" width="50" height="50">
+                  <div className="flex h-full w-full items-center justify-center">
+                    <Briefcase className="h-8 w-8 text-amber-600" />
                   </div>
-                  <Button size="sm" className="rounded-full bg-primary px-4 text-xs font-semibold">
-                    Learn more
-                  </Button>
-                </div>
-              </div>
-
-              {/* Job Search Card */}
-              <div className="mt-20 rounded-2xl bg-white/95 p-6 shadow-xl backdrop-blur-sm lg:w-96">
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Find Job</label>
-                    <button className="flex w-full items-center justify-between rounded-lg border-2 border-input bg-background px-4 py-2.5 text-left text-sm font-medium">
-                      Interior Designer
-                      <ChevronDown className="h-4 w-4" />
-                    </button>
+                </foreignObject>
+              </g>
+              
+              <g transform="translate(450, 180)">
+                <circle cx="0" cy="0" r="45" fill="#dbeafe" opacity="0.9" />
+                <foreignObject x="-22" y="-22" width="44" height="44">
+                  <div className="flex h-full w-full items-center justify-center">
+                    <Building2 className="h-7 w-7 text-blue-600" />
                   </div>
-
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between rounded-xl border border-border p-4">
-                      <div className="flex items-center gap-3">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-black">
-                          <Sparkles className="h-5 w-5 text-white" />
-                        </div>
-                        <div>
-                          <div className="text-sm font-semibold">Interior Designer</div>
-                          <div className="text-xs text-muted-foreground">Lullu Company</div>
-                        </div>
-                      </div>
-                      <Button size="sm" className="rounded-full bg-blue-500 px-4 text-xs hover:bg-blue-600">
-                        Apply
-                      </Button>
-                    </div>
-
-                    <div className="flex items-center justify-between rounded-xl border border-border p-4">
-                      <div className="flex items-center gap-3">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-black">
-                          <Target className="h-5 w-5 text-white" />
-                        </div>
-                        <div>
-                          <div className="text-sm font-semibold">Interior Designer</div>
-                          <div className="text-xs text-muted-foreground">Sintaral</div>
-                        </div>
-                      </div>
-                      <Button size="sm" className="rounded-full bg-blue-500 px-4 text-xs hover:bg-blue-600">
-                        Apply
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Decorative Image Placeholder */}
-              <div className="absolute bottom-0 right-0 -z-10 h-64 w-64 rounded-3xl bg-gradient-to-br from-blue-300 via-blue-400 to-white opacity-80 shadow-2xl" />
-            </div>
+                </foreignObject>
+              </g>
+            </svg>
           </div>
 
-          {/* Feature Cards */}
-          <div className="mt-24 rounded-3xl bg-white/90 p-8 shadow-sm backdrop-blur-sm">
-            <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
-              <div className="flex flex-col items-center gap-4 text-center">
-                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-blue-100">
-                  <User className="h-7 w-7 text-blue-500" />
-                </div>
-                <div className="space-y-2">
-                  <h3 className="text-base font-bold">Anonymous hiring</h3>
-                  <p className="text-pretty text-sm leading-relaxed text-muted-foreground">
-                    Hire based on talent, not personal details.
-                  </p>
-                </div>
-              </div>
+          {/* Right Side - Exchange Interface */}
+          <div className="space-y-8">
+            <div className="space-y-4">
+              <h2 className="text-balance text-5xl font-bold leading-tight tracking-tight text-foreground lg:text-6xl">
+                Find, match, and hire designers secure
+              </h2>
+            </div>
 
-              <div className="flex flex-col items-center gap-4 text-center">
-                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-purple-100">
-                  <Eye className="h-7 w-7 text-purple-500" />
+            {/* Exchange Card */}
+            <div className="rounded-3xl bg-white p-8 shadow-xl">
+              <div className="space-y-6">
+                {/* Tabs */}
+                <div className="flex gap-2">
+                  <button className="rounded-xl bg-muted px-6 py-2 text-sm font-semibold text-foreground">
+                    Job Search
+                  </button>
+                  <button className="rounded-xl px-6 py-2 text-sm font-medium text-muted-foreground hover:text-foreground">
+                    Portfolio Match
+                  </button>
                 </div>
-                <div className="space-y-2">
-                  <h3 className="text-base font-bold">Showcase portfolio</h3>
-                  <p className="text-pretty text-sm leading-relaxed text-muted-foreground">
-                    Designers are judged by their work, not resumes.
-                  </p>
-                </div>
-              </div>
 
-              <div className="flex flex-col items-center gap-4 text-center">
-                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
-                  <Search className="h-7 w-7 text-green-500" />
+                {/* You're Looking For */}
+                <div className="space-y-3">
+                  <label className="text-sm font-medium text-muted-foreground">
+                    You&apos;re looking for
+                  </label>
+                  <div className="flex items-center justify-between rounded-2xl border-2 border-muted p-4">
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-orange-100">
+                        <Building2 className="h-5 w-5 text-orange-600" />
+                      </div>
+                      <div>
+                        <div className="text-sm font-bold">Interior Designer</div>
+                        <div className="text-xs text-muted-foreground">Role</div>
+                      </div>
+                    </div>
+                    <ChevronDown className="h-5 w-5 text-muted-foreground" />
+                  </div>
+                  <div className="text-xs text-muted-foreground">
+                    Experience range: 2-5 years
+                  </div>
                 </div>
-                <div className="space-y-2">
-                  <h3 className="text-base font-bold">Smart Job Search</h3>
-                  <p className="text-pretty text-sm leading-relaxed text-muted-foreground">
-                    Advanced filters to find the perfect match.
-                  </p>
-                </div>
-              </div>
 
-              <div className="flex flex-col items-center gap-4 text-center">
-                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-pink-100">
-                  <Filter className="h-7 w-7 text-pink-500" />
+                {/* Swap Button */}
+                <div className="flex justify-center">
+                  <button className="flex h-10 w-10 items-center justify-center rounded-xl border-2 border-muted bg-background hover:bg-muted">
+                    <ArrowDownUp className="h-4 w-4" />
+                  </button>
                 </div>
-                <div className="space-y-2">
-                  <h3 className="text-base font-bold">Secure Design Test</h3>
-                  <p className="text-pretty text-sm leading-relaxed text-muted-foreground">
-                    Evaluate skills with real-world challenges.
-                  </p>
+
+                {/* You Get */}
+                <div className="space-y-3">
+                  <label className="text-sm font-medium text-muted-foreground">
+                    You get
+                  </label>
+                  <div className="flex items-center justify-between rounded-2xl border-2 border-muted p-4">
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-teal-100">
+                        <Briefcase className="h-5 w-5 text-teal-600" />
+                      </div>
+                      <div>
+                        <div className="text-sm font-bold">Qualified Candidates</div>
+                        <div className="text-xs text-muted-foreground">Match</div>
+                      </div>
+                    </div>
+                    <ChevronDown className="h-5 w-5 text-muted-foreground" />
+                  </div>
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="text-muted-foreground">
+                      Average match: 156 designers
+                    </span>
+                    <span className="text-green-600">(+ 23%)</span>
+                  </div>
                 </div>
+
+                {/* Exchange Button */}
+                <Button className="w-full rounded-2xl bg-black py-6 text-base font-semibold text-white hover:bg-black/90">
+                  Search now
+                </Button>
               </div>
             </div>
           </div>
         </div>
       </main>
+
+      {/* Footer */}
+      <footer className="relative z-10 mx-auto max-w-7xl px-6 py-8">
+        <div className="flex items-center justify-between border-t border-border pt-8">
+          <div className="flex gap-8">
+            <Link href="#" className="text-sm text-muted-foreground hover:text-foreground">
+              Terms of Service
+            </Link>
+            <Link href="#" className="text-sm text-muted-foreground hover:text-foreground">
+              Privacy Policy
+            </Link>
+            <Link href="#" className="text-sm text-muted-foreground hover:text-foreground">
+              Compliance
+            </Link>
+          </div>
+          <div className="text-sm text-muted-foreground">
+            @ 2026 RNT. All rights reserved.
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
