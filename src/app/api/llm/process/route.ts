@@ -82,7 +82,7 @@ function getMultiAgentSystemForSession(
   const meetingConfig: MeetingConfig = {
     agents: agentConfigsForSystem,
     humans: [], // Can be populated from meeting participants if needed
-    claude: { selectionModel: "claude-4-5-haiku-20241022" },
+    claude: { selectionModel: "claude-3-5-haiku-20241022" },
     perplexity: { responseModel: "sonar-pro" },
   };
 
