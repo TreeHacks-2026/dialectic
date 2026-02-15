@@ -1,33 +1,54 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import AvatarPanel, {
   type AvatarPanelHandle,
 } from "@/components/avatar-panel";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { getDialogueConfig, clearDialogueConfig, type DialogueConfig } from "@/lib/dialogue-config";
 
 interface SttMessage {
-  agent: "agent1" | "agent2" | "agent3";
+  agentId: string; // Changed from agent: "agent1" | "agent2" | "agent3"
   speaker: string;
   text: string;
   timestamp: string;
 }
 
 export default function TutorPage() {
-  const agent1Ref = useRef<AvatarPanelHandle>(null);
-  const agent2Ref = useRef<AvatarPanelHandle>(null);
-  const agent3Ref = useRef<AvatarPanelHandle>(null);
+  const router = useRouter();
+  const [config, setConfig] = useState<DialogueConfig | null>(null);
+  const agentRefsMap = useRef<Map<string, React.RefObject<AvatarPanelHandle>>>(new Map());
   const [log, setLog] = useState<SttMessage[]>([]);
   const [polling, setPolling] = useState(true); // Automatically enabled
   const logEndRef = useRef<HTMLDivElement>(null);
+  const [refsReady, setRefsReady] = useState(false);
 
-  const agentRefs: Record<string, React.RefObject<AvatarPanelHandle | null>> = {
-    agent1: agent1Ref,
-    agent2: agent2Ref,
-    agent3: agent3Ref,
-  };
+  // Load configuration on mount
+  useEffect(() => {
+    const loadedConfig = getDialogueConfig();
+    
+    if (!loadedConfig || !loadedConfig.agents || loadedConfig.agents.length === 0) {
+      console.warn('[Tutor] No dialogue config found, redirecting to home');
+      router.push('/');
+      return;
+    }
+
+    console.log('[Tutor] Loaded config with', loadedConfig.agents.length, 'agents');
+    setConfig(loadedConfig);
+
+    // Create refs dynamically for each agent
+    const refs = new Map<string, React.RefObject<AvatarPanelHandle>>();
+    loadedConfig.agents.forEach((agent) => {
+      const ref = { current: null } as React.RefObject<AvatarPanelHandle>;
+      refs.set(agent.id, ref);
+    });
+    agentRefsMap.current = refs;
+    setRefsReady(true);
+  }, [router]);
 
   // Auto-scroll the log
   useEffect(() => {
@@ -36,7 +57,7 @@ export default function TutorPage() {
 
   // Polling loop
   useEffect(() => {
-    if (!polling) return;
+    if (!polling || !config || !refsReady) return;
 
     const interval = setInterval(async () => {
       try {
@@ -49,9 +70,14 @@ export default function TutorPage() {
 
         setLog((prev) => [...prev, ...messages]);
 
+        // Route messages to correct avatar panels using agent IDs
         for (const msg of messages) {
-          const ref = agentRefs[msg.agent];
-          ref?.current?.speak(msg.text);
+          const ref = agentRefsMap.current.get(msg.agentId);
+          if (ref?.current) {
+            ref.current.speak(msg.text);
+          } else {
+            console.warn(`[Tutor] No ref found for agent ID: ${msg.agentId}`);
+          }
         }
       } catch (err) {
         console.error("Polling error:", err);
@@ -59,21 +85,35 @@ export default function TutorPage() {
     }, 2000);
 
     return () => clearInterval(interval);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [polling]);
+  }, [polling, config, refsReady]);
 
-  const agentBadgeColor = (agent: string) => {
-    switch (agent) {
-      case "agent1":
-        return "default";
-      case "agent2":
-        return "secondary";
-      case "agent3":
-        return "outline";
-      default:
-        return "default";
-    }
+  const agentBadgeColor = (agentId: string, index: number) => {
+    const colors: Array<"default" | "secondary" | "outline"> = ["default", "secondary", "outline"];
+    return colors[index % colors.length];
   };
+
+  const getAgentName = (agentId: string): string => {
+    return config?.agents.find(a => a.id === agentId)?.name || agentId;
+  };
+
+  const handleEndSession = () => {
+    // Clear frontend session config to allow fresh start with different avatars
+    clearDialogueConfig();
+    console.log('[Tutor] 🗑️ Cleared dialogue config, returning to home');
+    // Navigate back to home page
+    router.push('/');
+  };
+
+  if (!config) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="text-center">
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent mx-auto mb-4" />
+          <p className="text-muted-foreground">Loading dialogue configuration...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col h-screen font-[family-name:var(--font-geist-sans)]">
@@ -86,17 +126,34 @@ export default function TutorPage() {
           Dialectic
         </Link>
         <div className="flex items-center gap-4">
-          <span className="text-sm text-muted-foreground">
-            Poll Zoom STT: Enabled
-          </span>
+          <Button
+            onClick={handleEndSession}
+            variant="outline"
+            size="sm"
+          >
+            End Session
+          </Button>
         </div>
       </header>
 
-      {/* Avatars grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4">
-        <AvatarPanel ref={agent1Ref} label="Agent 1" />
-        <AvatarPanel ref={agent2Ref} label="Agent 2" />
-        <AvatarPanel ref={agent3Ref} label="Agent 3" />
+      {/* Avatars grid - dynamically rendered */}
+      <div className={`grid gap-4 p-4 ${
+        config.agents.length === 1 ? 'grid-cols-1' :
+        config.agents.length === 2 ? 'grid-cols-1 md:grid-cols-2' :
+        'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
+      }`}>
+        {config.agents.map((agent) => {
+          const ref = agentRefsMap.current.get(agent.id);
+          return (
+            <AvatarPanel
+              key={agent.id}
+              ref={ref || undefined}
+              label={agent.name}
+              avatarId={agent.heygen?.avatar_id}
+              voiceId={agent.heygen?.voice_id}
+            />
+          );
+        })}
       </div>
 
       {/* Message log */}
@@ -117,10 +174,10 @@ export default function TutorPage() {
               {log.map((msg, i) => (
                 <div key={i} className="flex items-start gap-2">
                   <Badge
-                    variant={agentBadgeColor(msg.agent) as "default" | "secondary" | "outline"}
+                    variant={agentBadgeColor(msg.agentId, i) as "default" | "secondary" | "outline"}
                     className="shrink-0 mt-0.5"
                   >
-                    {msg.agent}
+                    {getAgentName(msg.agentId)}
                   </Badge>
                   <div className="text-sm">
                     <span className="font-medium">{msg.speaker}:</span>{" "}

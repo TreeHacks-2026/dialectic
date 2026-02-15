@@ -25,11 +25,13 @@ interface AvatarPanelProps {
   onReady?: () => void;
   avatarName?: string;
   label?: string;
+  avatarId?: string;
+  voiceId?: string;
 }
 
 const AvatarPanel = forwardRef<AvatarPanelHandle, AvatarPanelProps>(
   function AvatarPanel(
-    { onReady, avatarName = "Wayne_20240711", label = "Avatar" },
+    { onReady, avatarName = "Wayne_20240711", label = "Avatar", avatarId, voiceId },
     ref
   ) {
     const [status, setStatus] = useState<AvatarStatus>("idle");
@@ -53,7 +55,15 @@ const AvatarPanel = forwardRef<AvatarPanelHandle, AvatarPanelProps>(
       setErrorMessage("");
 
       try {
-        const res = await fetch("/api/heygen/session", { method: "POST" });
+        // Pass avatar_id and voice_id to session API if provided
+        const res = await fetch("/api/heygen/session", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            avatar_id: avatarId,
+            voice_id: voiceId,
+          }),
+        });
         if (!res.ok) {
           const data = await res.json().catch(() => ({}));
           throw new Error(data.error || "Failed to create session");
@@ -87,7 +97,7 @@ const AvatarPanel = forwardRef<AvatarPanelHandle, AvatarPanelProps>(
         );
         setStatus("error");
       }
-    }, [avatarName, onReady]);
+    }, [avatarName, avatarId, voiceId, onReady]);
 
     const stopAvatar = useCallback(async () => {
       if (sessionRef.current) {

@@ -1,31 +1,63 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { MultiAgentSystem, ApiKeys } from '@/core/multi-agent-system';
-import { MeetingConfig } from '@/types/types';
+import { MeetingConfig, AgentConfig } from '@/types/types';
 import configData from '@/config/config.json';
 
 interface LLMProcessRequest {
   transcript: string;
   speaker: string;
   timestamp: number;
+  sessionId?: string; // Session identifier for per-session systems
+  agentConfigs?: Array<{ // Dynamic agent configurations
+    id: string;
+    name: string;
+    description: string;
+  }>;
   // Optional: full conversation history for context
   conversationHistory?: Array<{ speaker: string; text: string; timestamp: number }>;
 }
 
 interface LLMProcessResponse {
   response: string;
-  agent: 'agent1' | 'agent2' | 'agent3';
+  agentId: string; // Changed from agent: 'agent1' | 'agent2' | 'agent3'
+  agentName: string; // Agent's actual name
   processed_at: string;
 }
 
-// Singleton multi-agent system instance
-let multiAgentSystem: MultiAgentSystem | null = null;
+/**
+ * Session-based MultiAgentSystem storage
+ * Each session gets its own system instance with its own agent configuration
+ */
+interface SessionSystem {
+  config: MeetingConfig;
+  system: MultiAgentSystem;
+  agentIdMap: Map<string, string>; // Maps agent name -> agent ID
+  createdAt: number;
+}
+
+const sessionSystems = new Map<string, SessionSystem>();
+
+// Cleanup old sessions (older than 1 hour)
+setInterval(() => {
+  const now = Date.now();
+  for (const [sessionId, session] of sessionSystems.entries()) {
+    if (now - session.createdAt > 3600000) { // 1 hour
+      sessionSystems.delete(sessionId);
+      console.log(`[LLM] 🗑️ Cleaned up expired session: ${sessionId}`);
+    }
+  }
+}, 60000); // Run cleanup every minute
 
 /**
- * Get or create multi-agent system instance
+ * Get or create multi-agent system for a specific session
  */
-function getMultiAgentSystem(): MultiAgentSystem {
-  if (multiAgentSystem) {
-    return multiAgentSystem;
+function getMultiAgentSystemForSession(
+  sessionId: string,
+  agentConfigs: Array<{ id: string; name: string; description: string }>
+): SessionSystem {
+  // Check if session exists
+  if (sessionSystems.has(sessionId)) {
+    return sessionSystems.get(sessionId)!;
   }
 
   // Get API keys from environment
@@ -41,27 +73,66 @@ function getMultiAgentSystem(): MultiAgentSystem {
     perplexity: perplexityKey,
   };
 
-  const meetingConfig = configData as MeetingConfig;
-  multiAgentSystem = new MultiAgentSystem(meetingConfig, keys);
+  // Create MeetingConfig from agentConfigs
+  const agentConfigsForSystem: AgentConfig[] = agentConfigs.map(a => ({
+    name: a.name,
+    description: a.description,
+  }));
 
-  console.log('[LLM] ✅ Multi-agent system initialized with Claude');
+  const meetingConfig: MeetingConfig = {
+    agents: agentConfigsForSystem,
+    humans: [], // Can be populated from meeting participants if needed
+    claude: { selectionModel: "claude-3-5-haiku-20241022" },
+    perplexity: { responseModel: "sonar-pro" },
+  };
+
+  // Create agent name -> ID mapping
+  const agentIdMap = new Map<string, string>();
+  agentConfigs.forEach(a => {
+    agentIdMap.set(a.name, a.id);
+  });
+
+  // Create new MultiAgentSystem
+  const system = new MultiAgentSystem(meetingConfig, keys);
+
+  const sessionSystem: SessionSystem = {
+    config: meetingConfig,
+    system,
+    agentIdMap,
+    createdAt: Date.now(),
+  };
+
+  sessionSystems.set(sessionId, sessionSystem);
+
+  console.log(`[LLM] ✅ Created new multi-agent system for session: ${sessionId}`);
   console.log(`[LLM] Agents: ${meetingConfig.agents.map(a => a.name).join(', ')}`);
 
-  return multiAgentSystem;
+  return sessionSystem;
 }
 
 /**
- * Map agent name to avatar agent ID
- * Maps: Dr. Thesis -> agent1, Dev -> agent2, Sage -> agent3
+ * Get default multi-agent system (fallback for sessions without config)
  */
-function mapAgentToAvatar(agentName: string): 'agent1' | 'agent2' | 'agent3' {
-  const agentMap: Record<string, 'agent1' | 'agent2' | 'agent3'> = {
-    'Dr. Thesis': 'agent1',
-    'Dev': 'agent2',
-    'Sage': 'agent3',
+function getDefaultMultiAgentSystem(): MultiAgentSystem {
+  const claudeKey = process.env.CLAUDE_API_KEY || '';
+  const perplexityKey = process.env.PERPLEXITY_API_KEY || '';
+
+  if (!claudeKey || !perplexityKey) {
+    throw new Error('CLAUDE_API_KEY and PERPLEXITY_API_KEY must be set');
+  }
+
+  const keys: ApiKeys = {
+    claude: claudeKey,
+    perplexity: perplexityKey,
   };
 
-  return agentMap[agentName] || 'agent1'; // Default to agent1 if unknown
+  const meetingConfig = configData as MeetingConfig;
+  const system = new MultiAgentSystem(meetingConfig, keys);
+
+  console.log('[LLM] ✅ Using default multi-agent system');
+  console.log(`[LLM] Agents: ${meetingConfig.agents.map(a => a.name).join(', ')}`);
+
+  return system;
 }
 
 /**
@@ -71,7 +142,7 @@ function mapAgentToAvatar(agentName: string): 'agent1' | 'agent2' | 'agent3' {
 export async function POST(request: NextRequest) {
   try {
     const body = (await request.json()) as LLMProcessRequest;
-    const { transcript, speaker, conversationHistory } = body;
+    const { transcript, speaker, timestamp, sessionId, agentConfigs, conversationHistory } = body;
 
     if (!transcript || !speaker) {
       return NextResponse.json(
@@ -82,8 +153,21 @@ export async function POST(request: NextRequest) {
 
     console.log(`[LLM] 📝 Processing transcript from ${speaker}: ${transcript.substring(0, 50)}...`);
 
-    // Get multi-agent system
-    const system = getMultiAgentSystem();
+    // Get multi-agent system (session-based or default)
+    let system: MultiAgentSystem;
+    let agentIdMap: Map<string, string> | null = null;
+
+    if (sessionId && agentConfigs && agentConfigs.length > 0) {
+      // Use session-specific system
+      const sessionSystem = getMultiAgentSystemForSession(sessionId, agentConfigs);
+      system = sessionSystem.system;
+      agentIdMap = sessionSystem.agentIdMap;
+      console.log(`[LLM] Using session-specific system for: ${sessionId}`);
+    } else {
+      // Fallback to default system
+      system = getDefaultMultiAgentSystem();
+      console.log('[LLM] Using default system (no session config provided)');
+    }
 
     // If we have conversation history, add it to the transcript first
     if (conversationHistory && conversationHistory.length > 0) {
@@ -98,12 +182,20 @@ export async function POST(request: NextRequest) {
     console.log(`[LLM] ✅ Agent ${agentResponse.agent} responded`);
     console.log(`[LLM] 📄 Response: ${agentResponse.response.substring(0, 100)}...`);
 
-    // Map agent name to avatar ID
-    const avatarAgent = mapAgentToAvatar(agentResponse.agent);
+    // Map agent name to agent ID
+    let agentId: string;
+    if (agentIdMap) {
+      // Use session-specific mapping
+      agentId = agentIdMap.get(agentResponse.agent) || agentResponse.agent;
+    } else {
+      // Fallback: try to find in default config or use name as ID
+      agentId = agentResponse.agent;
+    }
 
     const response: LLMProcessResponse = {
       response: agentResponse.response,
-      agent: avatarAgent,
+      agentId: agentId,
+      agentName: agentResponse.agent,
       processed_at: agentResponse.timestamp,
     };
 

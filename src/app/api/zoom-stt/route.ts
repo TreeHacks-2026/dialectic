@@ -1,19 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { meetingTranscriptManager } from "@/lib/meeting-transcript";
 
-type Agent = "agent1" | "agent2" | "agent3";
-
-const VALID_AGENTS: Agent[] = ["agent1", "agent2", "agent3"];
-
 interface ZoomSttRequest {
-  agent: Agent;
+  agentId: string; // Changed from agent: "agent1" | "agent2" | "agent3"
   speaker: string;
   text: string;
   timestamp?: string;
 }
 
 interface QueuedMessage {
-  agent: Agent;
+  agentId: string; // Changed from agent: "agent1" | "agent2" | "agent3"
   speaker: string;
   text: string;
   timestamp: string;
@@ -37,11 +33,11 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const body = (await request.json()) as ZoomSttRequest;
-    const { agent, speaker, text, timestamp } = body;
+    const { agentId, speaker, text, timestamp } = body;
 
-    if (!agent || !VALID_AGENTS.includes(agent)) {
+    if (!agentId || typeof agentId !== "string" || agentId.trim().length === 0) {
       return NextResponse.json(
-        { error: "Agent is required and must be one of: agent1, agent2, agent3" },
+        { error: "agentId is required and must be a non-empty string" },
         { status: 400 }
       );
     }
@@ -61,7 +57,7 @@ export async function POST(request: NextRequest) {
     }
 
     const entry: QueuedMessage = {
-      agent,
+      agentId: agentId.trim(),
       speaker: speaker.trim(),
       text: text.trim(),
       timestamp: timestamp ?? new Date().toISOString(),
@@ -72,7 +68,10 @@ export async function POST(request: NextRequest) {
     // Also add to meeting transcript manager
     // Try to get current session ID from RTMS, or use a default
     const sessionId = meetingTranscriptManager.getCurrentSessionId() || 'default-session';
-    meetingTranscriptManager.addLLMResponse(sessionId, agent, text, entry.timestamp);
+    // Use agentId as the agent identifier for transcript
+    meetingTranscriptManager.addLLMResponse(sessionId, agentId, text, entry.timestamp);
+
+    console.log(`[Zoom STT] ✅ Queued message for agent ID: ${agentId}`);
 
     return NextResponse.json({
       success: true,

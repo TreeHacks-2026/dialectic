@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { RTMSClient } from '../../../../../packages/transcript-service/src/rtms-client';
 import { meetingTranscriptManager } from '@/lib/meeting-transcript';
 import { triggerMeetingAnalysis } from '@/lib/meeting-analysis';
+import { getSessionConfig, migratePendingConfigToSession } from '@/lib/session-config-storage';
 
 // Singleton RTMS client
 let rtmsClient: RTMSClient | null = null;
@@ -76,15 +77,34 @@ function getRTMSClient(): RTMSClient {
 
         console.log(`[RTMS API] 🔄 Sending to LLM processing layer...`);
 
+        // Get agent configs for this session (if available)
+        const sessionConfig = getSessionConfig(sessionId);
+        const agentConfigs = sessionConfig?.agents.map(a => ({
+          id: a.id,
+          name: a.name,
+          description: a.description,
+        }));
+
         // Call LLM processing endpoint
+        const llmRequestBody: any = {
+          transcript: event.text,
+          speaker: event.speaker_name,
+          timestamp: event.ts_ms,
+          sessionId: sessionId,
+        };
+
+        // Add agent configs if available
+        if (agentConfigs && agentConfigs.length > 0) {
+          llmRequestBody.agentConfigs = agentConfigs;
+          console.log(`[RTMS API] 📋 Using ${agentConfigs.length} agents from session config`);
+        } else {
+          console.log(`[RTMS API] ⚠️ No session config found, using default agents`);
+        }
+
         const llmResponse = await fetch(`${appUrl}/api/llm/process`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            transcript: event.text,
-            speaker: event.speaker_name,
-            timestamp: event.ts_ms,
-          }),
+          body: JSON.stringify(llmRequestBody),
         });
 
         if (!llmResponse.ok) {
@@ -95,19 +115,20 @@ function getRTMSClient(): RTMSClient {
 
         const llmResult = await llmResponse.json() as {
           response: string;
-          agent: 'agent1' | 'agent2' | 'agent3';
+          agentId: string;
+          agentName: string;
           processed_at: string;
         };
         
-        console.log(`[RTMS API] ✅ LLM processed, assigned to ${llmResult.agent}`);
+        console.log(`[RTMS API] ✅ LLM processed, assigned to ${llmResult.agentName} (ID: ${llmResult.agentId})`);
 
         // Forward LLM output to /api/zoom-stt queue for avatars
         const sttResponse = await fetch(`${appUrl}/api/zoom-stt`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            agent: llmResult.agent,
-            speaker: 'AI Assistant',
+            agentId: llmResult.agentId, // Changed from agent to agentId
+            speaker: llmResult.agentName, // Use agent name as speaker
             text: llmResult.response,
             timestamp: llmResult.processed_at,
           }),
@@ -117,7 +138,7 @@ function getRTMSClient(): RTMSClient {
           const errorText = await sttResponse.text();
           console.error(`[RTMS API] ❌ Failed to queue for avatar: ${sttResponse.status} ${errorText}`);
         } else {
-          console.log(`[RTMS API] ✅ Queued LLM response for ${llmResult.agent} avatar`);
+          console.log(`[RTMS API] ✅ Queued LLM response for ${llmResult.agentName} avatar (ID: ${llmResult.agentId})`);
           // Note: LLM response is automatically added to transcript by /api/zoom-stt POST handler
         }
       } catch (error) {
@@ -221,6 +242,24 @@ export async function POST(request: NextRequest) {
       
       // Start new session
       meetingTranscriptManager.startSession(sessionId);
+      
+      // Check if we have a stored config for this session
+      let sessionConfig = getSessionConfig(sessionId);
+      
+      if (!sessionConfig) {
+        // Try to migrate a pending config (temp session) to this RTMS session
+        const meetingUuid = payload.meeting_uuid as string | undefined;
+        sessionConfig = migratePendingConfigToSession(sessionId, meetingUuid);
+        
+        if (sessionConfig) {
+          console.log(`[RTMS API] ✅ Migrated pending config to session ${sessionId} with ${sessionConfig.agents.length} agents`);
+        } else {
+          console.log(`[RTMS API] ⚠️ No stored config found for session ${sessionId}`);
+          console.log(`[RTMS API] 💡 Will use default agents from config.json`);
+        }
+      } else {
+        console.log(`[RTMS API] ✅ Found stored config for session ${sessionId} with ${sessionConfig.agents.length} agents`);
+      }
       
       // Process webhook in RTMS client (establishes connection)
       client.handleWebhookEvent(webhookData);

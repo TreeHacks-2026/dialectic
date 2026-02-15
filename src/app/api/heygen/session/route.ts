@@ -1,6 +1,11 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
-export async function POST() {
+interface SessionRequest {
+  avatar_id?: string;
+  voice_id?: string;
+}
+
+export async function POST(request: NextRequest) {
   const apiKey = process.env.HEYGEN_API_KEY;
 
   if (!apiKey) {
@@ -11,6 +16,20 @@ export async function POST() {
   }
 
   try {
+    // Parse request body for dynamic avatar/voice config
+    let body: SessionRequest = {};
+    try {
+      body = await request.json();
+    } catch {
+      // If no body provided, use defaults
+    }
+
+    // Use provided IDs or fallback to defaults
+    const avatarId = body.avatar_id || "b6c94c07-e4e5-483e-8bec-e838d5910b7d";
+    const voiceId = body.voice_id || "4f3b1e99-b580-4f05-9b67-a5f585be0232";
+
+    console.log(`[HeyGen Session] Creating session with avatar_id: ${avatarId}, voice_id: ${voiceId}`);
+
     const response = await fetch(
       "https://api.liveavatar.com/v1/sessions/token",
       {
@@ -21,10 +40,10 @@ export async function POST() {
         },
         body: JSON.stringify({
           mode: "FULL",
-          avatar_id: "b6c94c07-e4e5-483e-8bec-e838d5910b7d",
+          avatar_id: avatarId,
           is_sandbox: false,
           avatar_persona: {
-            voice_id: "4f3b1e99-b580-4f05-9b67-a5f585be0232",
+            voice_id: voiceId,
             language: "en",
           },
         }),
