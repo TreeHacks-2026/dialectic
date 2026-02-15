@@ -21,6 +21,7 @@ type AvatarStatus = "idle" | "connecting" | "connected" | "error";
 
 export interface AvatarPanelHandle {
   speak: (text: string) => Promise<void>;
+  requestPiP: () => Promise<void>;
 }
 
 interface AvatarPanelProps {
@@ -32,6 +33,7 @@ interface AvatarPanelProps {
   onRequestPopout?: () => void;
   isPoppedOut?: boolean;
   colorAccent?: string;
+  onSpeakingChange?: (speaking: boolean) => void;
 }
 
 const AvatarPanel = forwardRef<AvatarPanelHandle, AvatarPanelProps>(
@@ -44,6 +46,7 @@ const AvatarPanel = forwardRef<AvatarPanelHandle, AvatarPanelProps>(
       onRequestPopout,
       isPoppedOut,
       colorAccent = "from-blue-500 to-cyan-400",
+      onSpeakingChange,
     },
     ref
   ) {
@@ -51,14 +54,33 @@ const AvatarPanel = forwardRef<AvatarPanelHandle, AvatarPanelProps>(
     const [errorMessage, setErrorMessage] = useState("");
     const sessionRef = useRef<LiveAvatarSession | null>(null);
     const videoRef = useRef<HTMLVideoElement>(null);
+    const speakTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     useImperativeHandle(ref, () => ({
       async speak(text: string) {
         if (!sessionRef.current) return;
         try {
           sessionRef.current.repeat(text);
+          onSpeakingChange?.(true);
+          if (speakTimeoutRef.current) clearTimeout(speakTimeoutRef.current);
+          speakTimeoutRef.current = setTimeout(() => {
+            onSpeakingChange?.(false);
+          }, 4000);
         } catch (err) {
           console.error("Avatar speak error:", err);
+        }
+      },
+      async requestPiP() {
+        try {
+          if (
+            videoRef.current &&
+            document.pictureInPictureEnabled &&
+            !document.pictureInPictureElement
+          ) {
+            await videoRef.current.requestPictureInPicture();
+          }
+        } catch (err) {
+          console.error("PiP request error:", err);
         }
       },
     }));

@@ -43,6 +43,7 @@ export default function TutorPage() {
   const agentRefsMap = useRef<Map<string, AvatarPanelHandle | null>>(new Map());
   const nextAgentNumber = useRef(1);
   const [poppedAgents, setPoppedAgents] = useState<Record<string, boolean>>({});
+  const [speakingAgents, setSpeakingAgents] = useState<Record<string, boolean>>({});
   const [log, setLog] = useState<SttMessage[]>([]);
   const [polling, setPolling] = useState(false);
   const logEndRef = useRef<HTMLDivElement>(null);
@@ -135,6 +136,15 @@ export default function TutorPage() {
     setPoppedAgents((prev) => ({ ...prev, [id]: false }));
   }, []);
 
+  const handleSpeakingChange = useCallback((agentId: string, speaking: boolean) => {
+    setSpeakingAgents((prev) => ({ ...prev, [agentId]: speaking }));
+  }, []);
+
+  const handleRequestPiP = useCallback((agentId: string) => {
+    const handle = agentRefsMap.current.get(agentId);
+    handle?.requestPiP();
+  }, []);
+
   const getAgentBadgeClass = (agentId: string): string => {
     const agent = agents.find((a) => a.id === agentId);
     if (!agent) return BADGE_PALETTE[0].badge;
@@ -219,6 +229,8 @@ export default function TutorPage() {
                 onTogglePopout={() => togglePopout(agent.id)}
                 onRestore={() => restoreAgent(agent.id)}
                 colorAccent={BADGE_PALETTE[agent.colorIndex % BADGE_PALETTE.length].accent}
+                isSpeaking={!!speakingAgents[agent.id]}
+                onRequestPiP={() => handleRequestPiP(agent.id)}
               >
                 <AvatarPanel
                   ref={(handle) => {
@@ -231,6 +243,7 @@ export default function TutorPage() {
                   onRemove={() => removeAgent(agent.id)}
                   onRequestPopout={() => togglePopout(agent.id)}
                   isPoppedOut={!!poppedAgents[agent.id]}
+                  onSpeakingChange={(speaking) => handleSpeakingChange(agent.id, speaking)}
                 />
               </PopoutContainer>
             </motion.div>

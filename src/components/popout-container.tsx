@@ -2,7 +2,7 @@
 
 import { type ReactNode, useRef, useState, useEffect } from "react";
 import { motion, useDragControls, useMotionValue } from "framer-motion";
-import { GripHorizontal, Maximize2, Minimize2, X } from "lucide-react";
+import { GripHorizontal, Maximize2, Minimize2, MonitorUp, X } from "lucide-react";
 import PopoutPlaceholder from "@/components/popout-placeholder";
 import { cn } from "@/lib/utils";
 
@@ -13,6 +13,8 @@ interface PopoutContainerProps {
   onTogglePopout: () => void;
   onRestore: () => void;
   colorAccent?: string;
+  isSpeaking?: boolean;
+  onRequestPiP?: () => void;
 }
 
 export default function PopoutContainer({
@@ -22,6 +24,8 @@ export default function PopoutContainer({
   onTogglePopout,
   onRestore,
   colorAccent,
+  isSpeaking,
+  onRequestPiP,
 }: PopoutContainerProps) {
   const dragControls = useDragControls();
   const constraintsRef = useRef<HTMLDivElement>(null);
@@ -64,9 +68,24 @@ export default function PopoutContainer({
         dragMomentum={false}
         dragConstraints={isPopped ? constraintsRef : undefined}
         style={{ x, y }}
+        animate={
+          isPopped
+            ? {
+                scale: isSpeaking ? 1.03 : 1,
+                boxShadow: isSpeaking
+                  ? "0 8px 50px rgba(59,130,246,0.15), 0 2px 12px rgba(0,0,0,0.04)"
+                  : "0 8px 40px rgba(0,0,0,0.08), 0 2px 12px rgba(0,0,0,0.04)",
+              }
+            : undefined
+        }
+        transition={{
+          scale: { type: "spring", stiffness: 200, damping: 15 },
+          boxShadow: { duration: 0.3 },
+        }}
         className={cn(
           isPopped &&
-            "fixed z-[9999] top-20 right-5 w-[400px] rounded-2xl border overflow-hidden bg-white/80 backdrop-blur-2xl border-white/40 shadow-[0_8px_40px_rgba(0,0,0,0.08),0_2px_12px_rgba(0,0,0,0.04)]"
+            "fixed z-[9999] top-20 right-5 w-[400px] rounded-2xl border overflow-hidden bg-white/80 backdrop-blur-2xl border-white/40 shadow-[0_8px_40px_rgba(0,0,0,0.08),0_2px_12px_rgba(0,0,0,0.04)]",
+          !isPopped && isSpeaking && "ring-2 ring-blue-400/40 ring-offset-1 rounded-2xl transition-shadow duration-300"
         )}
       >
         {/* Gradient accent line -- always in DOM, toggled via CSS */}
@@ -96,6 +115,15 @@ export default function PopoutContainer({
           </div>
 
           <div className="flex items-center gap-1">
+            {onRequestPiP && (
+              <button
+                onClick={onRequestPiP}
+                className="p-1 rounded-md transition-colors text-slate-400 hover:text-slate-700 hover:bg-slate-100"
+                title="Picture-in-Picture"
+              >
+                <MonitorUp className="h-4 w-4" />
+              </button>
+            )}
             <button
               onClick={() => setMinimized((prev) => !prev)}
               className="p-1 rounded-md transition-colors text-slate-400 hover:text-slate-700 hover:bg-slate-100"
