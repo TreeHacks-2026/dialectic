@@ -20,9 +20,13 @@ export async function POST() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          mode: "LITE",
+          mode: "FULL",
           avatar_id: "b6c94c07-e4e5-483e-8bec-e838d5910b7d",
           is_sandbox: false,
+          avatar_persona: {
+            voice_id: "4f3b1e99-b580-4f05-9b67-a5f585be0232",
+            language: "en",
+          },
         }),
       }
     );
