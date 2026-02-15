@@ -229,6 +229,7 @@ function CoursesTab() {
 }
 
 function ZoomSttTab() {
+  const [agent, setAgent] = useState<"agent1" | "agent2" | "agent3">("agent1");
   const [speaker, setSpeaker] = useState("John");
   const [text, setText] = useState("Hello, this is a test of the Zoom speech-to-text endpoint.");
   const [result, setResult] = useState<ApiResult | null>(null);
@@ -240,7 +241,7 @@ function ZoomSttTab() {
     const res = await apiCall("/api/zoom-stt", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ speaker, text }),
+      body: JSON.stringify({ agent, speaker, text }),
     });
     setResult(res);
     setLoading(false);
@@ -249,9 +250,26 @@ function ZoomSttTab() {
   return (
     <div className="space-y-4">
       <p className="text-sm text-muted-foreground">
-        Sends a speaker + text payload to POST /api/zoom-stt and returns a dummy confirmation.
+        Sends an agent + speaker + text payload to POST /api/zoom-stt and queues it for polling.
       </p>
       <div className="space-y-3">
+        <div>
+          <Label>Agent</Label>
+          <div className="flex gap-4 mt-1">
+            {(["agent1", "agent2", "agent3"] as const).map((a) => (
+              <label key={a} className="flex items-center gap-1.5 text-sm cursor-pointer">
+                <input
+                  type="radio"
+                  name="zoom-agent"
+                  value={a}
+                  checked={agent === a}
+                  onChange={() => setAgent(a)}
+                />
+                {a}
+              </label>
+            ))}
+          </div>
+        </div>
         <div>
           <Label htmlFor="zoom-speaker">Speaker</Label>
           <Input

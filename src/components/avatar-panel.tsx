@@ -19,10 +19,15 @@ export interface AvatarPanelHandle {
 
 interface AvatarPanelProps {
   onReady?: () => void;
+  avatarName?: string;
+  label?: string;
 }
 
 const AvatarPanel = forwardRef<AvatarPanelHandle, AvatarPanelProps>(
-  function AvatarPanel({ onReady }, ref) {
+  function AvatarPanel(
+    { onReady, avatarName = "Wayne_20240711", label = "Avatar" },
+    ref
+  ) {
     const [status, setStatus] = useState<AvatarStatus>("idle");
     const [errorMessage, setErrorMessage] = useState("");
     const avatarRef = useRef<any>(null);
@@ -85,7 +90,7 @@ const AvatarPanel = forwardRef<AvatarPanelHandle, AvatarPanelProps>(
 
         await avatar.createStartAvatar({
           quality: AvatarQuality.Medium,
-          avatarName: "Wayne_20240711",
+          avatarName,
         });
       } catch (err) {
         console.error("Avatar init error:", err);
@@ -94,7 +99,7 @@ const AvatarPanel = forwardRef<AvatarPanelHandle, AvatarPanelProps>(
         );
         setStatus("error");
       }
-    }, [onReady]);
+    }, [avatarName, onReady]);
 
     const stopAvatar = useCallback(async () => {
       if (avatarRef.current) {
@@ -116,6 +121,7 @@ const AvatarPanel = forwardRef<AvatarPanelHandle, AvatarPanelProps>(
     return (
       <Card className="flex flex-col h-full">
         <CardContent className="flex-1 flex flex-col items-center justify-center p-4 gap-3">
+          <h3 className="text-sm font-medium text-muted-foreground">{label}</h3>
           <div className="relative w-full aspect-video bg-muted rounded-lg overflow-hidden">
             <video
               ref={videoRef}
