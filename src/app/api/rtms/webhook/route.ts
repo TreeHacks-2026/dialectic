@@ -16,6 +16,18 @@ const transcriptQueue: Array<{
   is_final: boolean;
 }> = [];
 
+// Deduplication: Track recently processed transcripts to prevent duplicate processing
+const processedTranscripts = new Set<string>();
+
+// Clean up old processed transcripts periodically
+setInterval(() => {
+  if (processedTranscripts.size > 100) {
+    const oldSize = processedTranscripts.size;
+    processedTranscripts.clear();
+    console.log(`[RTMS API] 🧹 Cleaned up ${oldSize} processed transcript keys`);
+  }
+}, 60000); // Every minute
+
 /**
  * Get or create RTMS client
  */
@@ -51,6 +63,14 @@ function getRTMSClient(): RTMSClient {
 
     // Only process final transcripts through the LLM pipeline
     if (event.is_final) {
+      // Deduplication: Check if we've already processed this transcript
+      const transcriptKey = `${event.speaker_name}:${event.text}:${event.ts_ms}`;
+      if (processedTranscripts.has(transcriptKey)) {
+        console.log(`[RTMS API] ⚠️ Duplicate transcript detected, skipping: ${event.text.substring(0, 50)}...`);
+        return;
+      }
+      processedTranscripts.add(transcriptKey);
+      console.log(`[RTMS API] ✅ Processing new transcript (key: ${transcriptKey.substring(0, 50)}...)`);
       // Add to meeting transcript manager
       // Get session ID with proper fallback chain
       const sessionId = rtmsClient?.getCurrentSessionId() 
@@ -72,12 +92,14 @@ function getRTMSClient(): RTMSClient {
 
       // Send to LLM processing layer
       try {
-        const appUrl = process.env.NEXT_PUBLIC_APP_URL || 
-                      (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 
-                      process.env.RENDER_EXTERNAL_URL || 
-                      'http://localhost:3000');
-
-        console.log(`[RTMS API] 🔄 Sending to LLM processing layer...`);
+        // Use localhost for internal API calls to avoid network latency
+        const port = process.env.PORT || '3000';
+        const appUrl = process.env.NODE_ENV === 'production'
+          ? (process.env.RENDER_EXTERNAL_URL || `http://localhost:${port}`)
+          : 'http://localhost:3000';
+        
+        console.log(`[RTMS API] 🔄 Sending to LLM processing layer (using ${appUrl})...`);
+        const llmStartTime = Date.now();
 
         // Get agent configs for this session (if available)
         const sessionConfig = getSessionConfig(sessionId);
@@ -103,11 +125,34 @@ function getRTMSClient(): RTMSClient {
           console.log(`[RTMS API] ⚠️ No session config found, using default agents`);
         }
 
-        const llmResponse = await fetch(`${appUrl}/api/llm/process`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(llmRequestBody),
-        });
+        // Add timeout to LLM fetch (30 seconds)
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => {
+          controller.abort();
+          console.error(`[RTMS API] ⏱️ LLM processing timeout after 30s`);
+        }, 30000);
+
+        let llmResponse: Response;
+        try {
+          llmResponse = await fetch(`${appUrl}/api/llm/process`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(llmRequestBody),
+            signal: controller.signal,
+          });
+          clearTimeout(timeoutId);
+        } catch (fetchError: any) {
+          clearTimeout(timeoutId);
+          if (fetchError.name === 'AbortError') {
+            console.error(`[RTMS API] ❌ LLM processing timed out after 30s`);
+          } else {
+            console.error(`[RTMS API] ❌ LLM fetch error:`, fetchError);
+          }
+          return;
+        }
+
+        const llmDuration = Date.now() - llmStartTime;
+        console.log(`[RTMS API] ⏱️ LLM fetch completed in ${llmDuration}ms`);
 
         if (!llmResponse.ok) {
           const errorText = await llmResponse.text();
@@ -122,27 +167,36 @@ function getRTMSClient(): RTMSClient {
           processed_at: string;
         };
         
-        console.log(`[RTMS API] ✅ LLM processed, assigned to ${llmResult.agentName} (ID: ${llmResult.agentId})`);
+        const totalDuration = Date.now() - llmStartTime;
+        console.log(`[RTMS API] ✅ LLM processed in ${totalDuration}ms, assigned to ${llmResult.agentName} (ID: ${llmResult.agentId})`);
 
-        // Forward LLM output to /api/zoom-stt queue for avatars
-        const sttResponse = await fetch(`${appUrl}/api/zoom-stt`, {
+        // Forward LLM output to /api/zoom-stt queue for avatars (non-blocking)
+        const sttStartTime = Date.now();
+        const sttResponsePromise = fetch(`${appUrl}/api/zoom-stt`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            agentId: llmResult.agentId, // Changed from agent to agentId
-            speaker: llmResult.agentName, // Use agent name as speaker
+            agentId: llmResult.agentId,
+            speaker: llmResult.agentName,
             text: llmResult.response,
             timestamp: llmResult.processed_at,
           }),
+        }).then(res => {
+          const sttDuration = Date.now() - sttStartTime;
+          if (res.ok) {
+            console.log(`[RTMS API] ✅ Queued LLM response for ${llmResult.agentName} avatar (ID: ${llmResult.agentId}) in ${sttDuration}ms`);
+          } else {
+            return res.text().then(errorText => {
+              console.error(`[RTMS API] ❌ Failed to queue for avatar (${sttDuration}ms): ${res.status} ${errorText}`);
+            });
+          }
+        }).catch(err => {
+          const sttDuration = Date.now() - sttStartTime;
+          console.error(`[RTMS API] ❌ Error queueing for avatar (${sttDuration}ms):`, err);
         });
 
-        if (!sttResponse.ok) {
-          const errorText = await sttResponse.text();
-          console.error(`[RTMS API] ❌ Failed to queue for avatar: ${sttResponse.status} ${errorText}`);
-        } else {
-          console.log(`[RTMS API] ✅ Queued LLM response for ${llmResult.agentName} avatar (ID: ${llmResult.agentId})`);
-          // Note: LLM response is automatically added to transcript by /api/zoom-stt POST handler
-        }
+        // Don't await - let it run in background (non-blocking)
+        // Note: LLM response is automatically added to transcript by /api/zoom-stt POST handler
       } catch (error) {
         console.error('[RTMS API] ❌ Error in LLM pipeline:', error);
       }
