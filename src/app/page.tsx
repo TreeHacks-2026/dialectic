@@ -5,20 +5,13 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Mic } from "lucide-react";
 import { motion } from "framer-motion";
-import { DotPattern, GridPattern, AnimatedBeams } from "@/components/ui/animated-background";
+import { AceternitBackground } from "@/components/ui/animated-background";
 
 export default function Home() {
   return (
     <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-white via-blue-50/30 to-cyan-50/20">
       {/* Aceternity Animated Background */}
-      <div className="absolute inset-0 overflow-hidden">
-        <DotPattern className="text-blue-400/20" />
-        <GridPattern className="text-cyan-400/10" strokeDasharray="4 2" />
-        <AnimatedBeams />
-        <div className="absolute -left-20 top-20 h-96 w-96 animate-blob rounded-full bg-blue-400/20 mix-blend-multiply blur-3xl filter" />
-        <div className="animation-delay-2000 absolute right-20 top-40 h-96 w-96 animate-blob rounded-full bg-cyan-400/15 mix-blend-multiply blur-3xl filter" />
-        <div className="animation-delay-4000 absolute bottom-20 left-1/3 h-96 w-96 animate-blob rounded-full bg-sky-400/15 mix-blend-multiply blur-3xl filter" />
-      </div>
+      <AceternitBackground />
 
 
       {/* Header */}

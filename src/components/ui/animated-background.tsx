@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useRef, useEffect } from "react";
 import { cn } from "@/lib/utils";
 
 export const DotPattern = ({
@@ -121,3 +121,129 @@ export const BackgroundGradientAnimation = ({
     </div>
   );
 };
+
+export function AceternitBackground({
+  children,
+  className,
+  interactive = true,
+}: {
+  children?: React.ReactNode;
+  className?: string;
+  interactive?: boolean;
+}) {
+  const interactiveRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!interactive) return;
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!interactiveRef.current) return;
+      const rect = interactiveRef.current.getBoundingClientRect();
+      interactiveRef.current.style.setProperty("--mouse-x", `${e.clientX - rect.left}px`);
+      interactiveRef.current.style.setProperty("--mouse-y", `${e.clientY - rect.top}px`);
+    };
+    const el = interactiveRef.current;
+    if (el) {
+      el.addEventListener("mousemove", handleMouseMove);
+      return () => el.removeEventListener("mousemove", handleMouseMove);
+    }
+  }, [interactive]);
+
+  return (
+    <div
+      ref={interactiveRef}
+      className={cn("absolute inset-0 overflow-hidden", className)}
+    >
+      <svg className="hidden">
+        <defs>
+          <filter id="blurMe">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur" />
+            <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -8" result="goo" />
+            <feBlend in="SourceGraphic" in2="goo" />
+          </filter>
+        </defs>
+      </svg>
+      <div
+        className="h-full w-full blur-lg"
+        style={{ filter: "url(#blurMe) blur(40px)" }}
+      >
+        {/* Cyan blob - moves vertically */}
+        <div
+          className="absolute animate-aceternity-vertical"
+          style={{
+            background: "radial-gradient(circle at center, rgba(6,182,212,0.5) 0, rgba(6,182,212,0) 50%) no-repeat",
+            mixBlendMode: "hard-light",
+            width: "80%",
+            height: "80%",
+            top: "calc(20% - 40%)",
+            left: "calc(10% - 40%)",
+          }}
+        />
+        {/* Blue blob - moves in circle reverse */}
+        <div
+          className="absolute animate-aceternity-circle-reverse"
+          style={{
+            background: "radial-gradient(circle at center, rgba(59,130,246,0.5) 0, rgba(59,130,246,0) 50%) no-repeat",
+            mixBlendMode: "hard-light",
+            width: "80%",
+            height: "80%",
+            top: "calc(60% - 40%)",
+            left: "calc(80% - 40%)",
+          }}
+        />
+        {/* Sky blob - moves in circle */}
+        <div
+          className="absolute animate-aceternity-circle"
+          style={{
+            background: "radial-gradient(circle at center, rgba(14,165,233,0.5) 0, rgba(14,165,233,0) 50%) no-repeat",
+            mixBlendMode: "hard-light",
+            width: "80%",
+            height: "80%",
+            top: "calc(70% - 40%)",
+            left: "calc(20% - 40%)",
+          }}
+        />
+        {/* Indigo blob - moves horizontally */}
+        <div
+          className="absolute animate-aceternity-horizontal"
+          style={{
+            background: "radial-gradient(circle at center, rgba(99,102,241,0.5) 0, rgba(99,102,241,0) 50%) no-repeat",
+            mixBlendMode: "hard-light",
+            width: "80%",
+            height: "80%",
+            top: "calc(30% - 40%)",
+            left: "calc(60% - 40%)",
+            opacity: 0.7,
+          }}
+        />
+        {/* Cyan-400 blob - moves in circle */}
+        <div
+          className="absolute animate-aceternity-circle"
+          style={{
+            background: "radial-gradient(circle at center, rgba(34,211,238,0.5) 0, rgba(34,211,238,0) 50%) no-repeat",
+            mixBlendMode: "hard-light",
+            width: "80%",
+            height: "80%",
+            top: "calc(40% - 40%)",
+            left: "calc(90% - 40%)",
+          }}
+        />
+        {/* Interactive mouse-following blob */}
+        {interactive && (
+          <div
+            className="absolute"
+            style={{
+              background: "radial-gradient(circle at center, rgba(56,189,248,0.4) 0, rgba(56,189,248,0) 50%) no-repeat",
+              mixBlendMode: "hard-light",
+              width: "100%",
+              height: "100%",
+              top: "calc(var(--mouse-y, 50%) - 50%)",
+              left: "calc(var(--mouse-x, 50%) - 50%)",
+              opacity: 0.5,
+            }}
+          />
+        )}
+      </div>
+      {children}
+    </div>
+  );
+}

@@ -58,7 +58,11 @@ const config: Config = {
   		},
   		animation: {
   			blob: 'blob 7s infinite',
-  			shimmer: 'shimmer 8s infinite linear'
+  			shimmer: 'shimmer 8s infinite linear',
+  			'aceternity-circle': 'aceternityMoveInCircle 20s linear infinite',
+  			'aceternity-circle-reverse': 'aceternityMoveInCircle 20s reverse infinite',
+  			'aceternity-vertical': 'aceternityMoveVertical 30s ease infinite',
+  			'aceternity-horizontal': 'aceternityMoveHorizontal 40s ease infinite',
   		},
   		keyframes: {
   			blob: {
@@ -82,7 +86,22 @@ const config: Config = {
   				'100%': {
   					transform: 'translateX(100%)'
   				}
-  			}
+  			},
+  			aceternityMoveInCircle: {
+  				'0%': { transform: 'rotate(0deg)' },
+  				'50%': { transform: 'rotate(180deg)' },
+  				'100%': { transform: 'rotate(360deg)' },
+  			},
+  			aceternityMoveVertical: {
+  				'0%': { transform: 'translateY(-50%)' },
+  				'50%': { transform: 'translateY(50%)' },
+  				'100%': { transform: 'translateY(-50%)' },
+  			},
+  			aceternityMoveHorizontal: {
+  				'0%': { transform: 'translateX(-50%) translateY(-10%)' },
+  				'50%': { transform: 'translateX(50%) translateY(10%)' },
+  				'100%': { transform: 'translateX(-50%) translateY(-10%)' },
+  			},
   		}
   	}
   },
